@@ -16,4 +16,4 @@
 - Neovim  
 
 ## Опублікований продукт
-Сайт проєкту доступний за посиланням: [GitHub Pages](https://<ваше_ім'я>.github.io/mao-admin-panel)
+Сайт проєкту доступний за посиланням: [GitHub Pages](https://olegnck404.github.io/mao-admin-panel)
