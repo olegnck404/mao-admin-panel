@@ -1,11 +1,11 @@
 # MAO Admin Panel
 
-Административная панель для управления системой MAO. Проект построен на принципах Clean Architecture с использованием React и TypeScript.
+Адміністративна панель для керування системою MAO. Проєкт побудований на принципах Clean Architecture з використанням React і TypeScript.
 
-## Быстрый старт
+## Швидкий старт
 
 ```bash
-# Клонирование репозитория
+# Клонування репозиторію
 
 git clone https://github.com/your-username/mao-admin-panel.git
 cd mao-admin-panel
@@ -13,23 +13,23 @@ npm install
 npm run dev
 ```
 
-## Структура проекта
+## Структура проєкту
 
-- `src/` — исходный код (domain, application, infrastructure, presentation)
-- `docs/` — подробная документация (архитектура, API, гайды)
-- `public/` — статические файлы
+- `src/` — вихідний код (domain, application, infrastructure, presentation)
+- `docs/` — детальна документація (архітектура, API, гайди)
+- `public/` — статичні файли
 
-## Документация
+## Документація
 
-- [Полная документация](docs/FULL_DOCUMENTATION.md)
-- [Руководство разработчика](docs/development-guide.md)
-- [Архитектура](docs/ARCHITECTURE.md)
+- [Повна документація](docs/FULL_DOCUMENTATION.md)
+- [Гайд для розробника](docs/development-guide.md)
+- [Архітектура](docs/ARCHITECTURE.md)
 - [API](docs/API.md)
-- [Ошибки](docs/errors.md)
+- [Помилки](docs/errors.md)
 
-## CI/CD с GitHub Actions
+## CI/CD з GitHub Actions
 
-Для автоматизации сборки и тестирования используйте GitHub Actions. Пример workflow:
+Для автоматизації збірки та тестування використовуйте GitHub Actions. Приклад workflow:
 
 ```yaml
 name: Node.js CI
@@ -55,13 +55,13 @@ jobs:
       - run: npm run build
 ```
 
-## Внесение изменений
+## Внесення змін
 
-1. Создайте новую ветку для изменений
-2. Покройте новый функционал тестами
-3. Сделайте осмысленный commit
-4. Откройте Pull Request
+1. Створіть нову гілку для змін
+2. Покрийте новий функціонал тестами
+3. Зробіть осмислений commit
+4. Відкрийте Pull Request
 
-## Лицензия
+## Ліцензія
 
 MIT
