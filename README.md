@@ -1,6 +1,11 @@
 # MAO Admin Panel
 
+[![CI/CD](https://github.com/olegnck404/mao-admin-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/olegnck404/mao-admin-panel/actions/workflows/ci.yml)
+[![Documentation](https://github.com/olegnck404/mao-admin-panel/actions/workflows/documentation.yml/badge.svg)](https://github.com/olegnck404/mao-admin-panel/actions/workflows/documentation.yml)
+
 Адміністративна панель для керування системою MAO. Проєкт побудований на принципах Clean Architecture з використанням React і TypeScript.
+
+[📚 Документация](https://olegnck404.github.io/mao-admin-panel/)
 
 ## Швидкий старт
 
