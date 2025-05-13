@@ -1,44 +1,44 @@
-import { useState, ReactNode } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
-import {
-  AppBar,
-  Box,
-  CssBaseline,
-  Drawer,
-  IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Toolbar,
-  Typography,
-  useTheme,
-  useMediaQuery,
-  Avatar,
-  Tooltip,
-  Switch,
-  Menu,
-  MenuItem,
-  Badge,
-  InputBase,
-  Paper,
-  Popover,
-  Divider,
-} from '@mui/material';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
 import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
+import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
 import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
+import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
+import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
+import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
+import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
 import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
+import {
+    AppBar,
+    Avatar,
+    Badge,
+    Box,
+    CssBaseline,
+    Divider,
+    Drawer,
+    IconButton,
+    InputBase,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Paper,
+    Popover,
+    Switch,
+    Toolbar,
+    Tooltip,
+    Typography,
+    useMediaQuery,
+    useTheme,
+} from '@mui/material';
 import { keyframes } from '@mui/system';
-import { useThemeMode } from '../App';
-import { useAuth } from '../App';
+import { ReactNode, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { useThemeMode } from '../contexts/ThemeContext';
 
 const drawerWidth = 280;
 
@@ -54,15 +54,15 @@ const fadeIn = keyframes`
 `;
 
 const menuItems = [
-  { text: 'Dashboard', icon: <HomeRoundedIcon />, path: '/' },
-  { text: 'Tasks', icon: <FormatListBulletedRoundedIcon />, path: '/tasks' },
-  { text: 'Attendance', icon: <AccessTimeRoundedIcon />, path: '/attendance' },
-  { text: 'Rewards', icon: <EmojiEventsRoundedIcon />, path: '/rewards' },
+  { text: 'Dashboard', icon: <HomeRoundedIcon />, path: '/mao-admin-panel' },
+  { text: 'Tasks', icon: <FormatListBulletedRoundedIcon />, path: '/mao-admin-panel/tasks' },
+  { text: 'Attendance', icon: <AccessTimeRoundedIcon />, path: '/mao-admin-panel/attendance' },
+  { text: 'Rewards', icon: <EmojiEventsRoundedIcon />, path: '/mao-admin-panel/rewards' },
 ];
 
-interface LayoutProps {
+type LayoutProps = {
   children: ReactNode;
-}
+};
 
 export default function Layout({ children }: LayoutProps) {
   const theme = useTheme();
@@ -490,4 +490,4 @@ export default function Layout({ children }: LayoutProps) {
       </Box>
     </Box>
   );
-} 
+}

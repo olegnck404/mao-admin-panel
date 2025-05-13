@@ -1,18 +1,18 @@
-import { useState } from 'react';
-import {
-  Box,
-  Paper,
-  Typography,
-  TextField,
-  Button,
-  IconButton,
-  InputAdornment,
-  useTheme,
-} from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../App';
+import {
+    Box,
+    Button,
+    IconButton,
+    InputAdornment,
+    Paper,
+    TextField,
+    Typography,
+    useTheme,
+} from '@mui/material';
 import { keyframes } from '@mui/system';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 
 const liquidAnimation = keyframes`
   0% {
@@ -57,7 +57,7 @@ export default function Login() {
     e.preventDefault();
     if (formData.email === 'admin@oleg' && formData.password === 'bestpass') {
       login();
-      navigate('/');
+      navigate('/mao-admin-panel');
     } else {
       setError('Invalid email or password');
     }

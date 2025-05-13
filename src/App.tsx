@@ -1,44 +1,15 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import { useState, useEffect, createContext, useContext } from 'react';
-import Layout from './components/Layout';
-import Dashboard from './pages/Dashboard';
-import Tasks from './pages/Tasks';
-import Attendance from './pages/Attendance';
-import Rewards from './pages/Rewards';
-import Login from './pages/Login';
-import { lightTheme, darkTheme } from './theme';
+import { ThemeProvider } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
+import { BrowserRouter, useRoutes } from 'react-router-dom';
+import { AuthContext } from './contexts/AuthContext';
+import { ThemeContext } from './contexts/ThemeContext';
+import { routes } from './routes';
+import { darkTheme, lightTheme } from './theme';
 
-interface ThemeContextType {
-  mode: 'light' | 'dark';
-  toggleTheme: () => void;
-}
-
-export const ThemeContext = createContext<ThemeContextType>({
-  mode: 'light',
-  toggleTheme: () => {},
-});
-
-export const useThemeMode = () => useContext(ThemeContext);
-
-interface AuthContextType {
-  isAuthenticated: boolean;
-  login: () => void;
-  logout: () => void;
-}
-
-export const AuthContext = createContext<AuthContextType>({
-  isAuthenticated: false,
-  login: () => {},
-  logout: () => {},
-});
-
-export const useAuth = () => useContext(AuthContext);
-
-function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
-  return isAuthenticated ? <>{children}</> : <Navigate to="/login" />;
+function AppRoutes() {
+  const routing = useRoutes(routes);
+  return routing;
 }
 
 function App() {
@@ -77,29 +48,7 @@ function App() {
         <ThemeProvider theme={theme}>
           <CssBaseline />
           <BrowserRouter>
-            <Routes>
-              <Route path="/login" element={<Login />} />
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <Routes>
-                        <Route path="/" element={<Dashboard />} />
-                        <Route path="/tasks" element={<Tasks />} />
-                        <Route path="/attendance" element={<Attendance />} />
-                        <Route path="/rewards" element={<Rewards />} />
-                      </Routes>
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              >
-                <Route index element={<Dashboard />} />
-                <Route path="tasks" element={<Tasks />} />
-                <Route path="attendance" element={<Attendance />} />
-                <Route path="rewards" element={<Rewards />} />
-              </Route>
-            </Routes>
+            <AppRoutes />
           </BrowserRouter>
         </ThemeProvider>
       </ThemeContext.Provider>

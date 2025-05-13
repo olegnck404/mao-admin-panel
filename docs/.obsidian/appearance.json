@@ -1,0 +1,14 @@
+{
+  "theme": "obsidian",
+  "accentColor": "#23BB7F",
+  "cssTheme": "Hipstersmoothie",
+  "interfaceFontFamily": "JetBrains Mono Nerd Font Mono",
+  "textFontFamily": "JetBrains Mono Nerd Font Mono",
+  "monospaceFontFamily": "JetBrains Mono Nerd Font Mono",
+  "baseFontSize": 10,
+  "enabledCssSnippets": [],
+  "translucency": false,
+  "nativeMenus": true,
+  "showViewHeader": true,
+  "baseFontSizeAction": true
+}

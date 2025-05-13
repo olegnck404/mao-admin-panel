@@ -1,26 +1,26 @@
-import { ReactNode, useState } from 'react';
-import { 
-AppBar, 
-Box, 
-CssBaseline, 
-Divider, 
-Drawer, 
-IconButton, 
-List, 
-ListItem, 
-ListItemButton, 
-ListItemIcon, 
-ListItemText, 
-Toolbar, 
-Typography, 
-useTheme,
-useMediaQuery
-} from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
 import DashboardIcon from '@mui/icons-material/Dashboard';
+import LogoutIcon from '@mui/icons-material/Logout';
+import MenuIcon from '@mui/icons-material/Menu';
 import PeopleIcon from '@mui/icons-material/People';
 import SettingsIcon from '@mui/icons-material/Settings';
-import LogoutIcon from '@mui/icons-material/Logout';
+import {
+    AppBar,
+    Box,
+    CssBaseline,
+    Divider,
+    Drawer,
+    IconButton,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Toolbar,
+    Typography,
+    useMediaQuery,
+    useTheme
+} from '@mui/material';
+import { ReactNode, useState } from 'react';
 
 const drawerWidth = 240;
 

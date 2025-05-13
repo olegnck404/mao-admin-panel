@@ -1,38 +1,38 @@
-import { useState } from 'react';
+import AddIcon from '@mui/icons-material/Add';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
-  Typography,
-  Paper,
   Button,
-  TextField,
-  IconButton,
+  Card,
+  CardContent,
   Chip,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormControl,
+  Grid,
+  InputLabel,
+  MenuItem,
+  Paper,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  useTheme,
+  TextField,
+  Typography,
   useMediaQuery,
-  Card,
-  CardContent,
-  Grid,
+  useTheme,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import SearchIcon from '@mui/icons-material/Search';
+import { alpha } from '@mui/material/styles';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { useState } from 'react';
 
 interface Task {
   id: number;
@@ -204,7 +204,7 @@ export default function Tasks() {
                         label={task.priority}
                         size="small"
                         sx={{
-                          bgcolor: `${getPriorityColor(task.priority)}15`,
+                          bgcolor: alpha(getPriorityColor(task.priority), 0.1),
                           color: getPriorityColor(task.priority),
                           fontWeight: 600,
                         }}
@@ -213,7 +213,7 @@ export default function Tasks() {
                         label={task.status}
                         size="small"
                         sx={{
-                          bgcolor: `${getStatusColor(task.status)}15`,
+                          bgcolor: alpha(getStatusColor(task.status), 0.1),
                           color: getStatusColor(task.status),
                           fontWeight: 600,
                         }}
@@ -248,7 +248,7 @@ export default function Tasks() {
                       label={task.priority}
                       size="small"
                       sx={{
-                        bgcolor: `${getPriorityColor(task.priority)}15`,
+                        bgcolor: alpha(getPriorityColor(task.priority), 0.1),
                         color: getPriorityColor(task.priority),
                         fontWeight: 600,
                       }}
@@ -259,7 +259,7 @@ export default function Tasks() {
                       label={task.status}
                       size="small"
                       sx={{
-                        bgcolor: `${getStatusColor(task.status)}15`,
+                        bgcolor: alpha(getStatusColor(task.status), 0.1),
                         color: getStatusColor(task.status),
                         fontWeight: 600,
                       }}
@@ -306,7 +306,7 @@ export default function Tasks() {
               <Select
                 value={newTask.priority}
                 label="Priority"
-                onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as Task['priority'] })}
               >
                 <MenuItem value="High">High</MenuItem>
                 <MenuItem value="Medium">Medium</MenuItem>
@@ -318,7 +318,7 @@ export default function Tasks() {
               <Select
                 value={newTask.status}
                 label="Status"
-                onChange={(e) => setNewTask({ ...newTask, status: e.target.value })}
+                onChange={(e) => setNewTask({ ...newTask, status: e.target.value as Task['status'] })}
               >
                 <MenuItem value="Todo">Todo</MenuItem>
                 <MenuItem value="In Progress">In Progress</MenuItem>
@@ -336,4 +336,4 @@ export default function Tasks() {
       </Dialog>
     </Box>
   );
-} 
+}

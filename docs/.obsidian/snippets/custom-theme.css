@@ -1,0 +1,262 @@
+/* Custom Obsidian Theme based on VS Code settings
+ * Implements JetBrains Mono font and clean, minimal styling
+ */
+
+/* === Font Settings === */
+body {
+  --font-text: "JetBrains Mono Nerd Font Mono", monospace;
+  --font-monospace: "JetBrains Mono Nerd Font Mono", monospace;
+  --font-interface: "JetBrains Mono Nerd Font Mono", monospace;
+  --font-editor: "JetBrains Mono Nerd Font Mono", monospace;
+  --font-code: "JetBrains Mono Nerd Font Mono", monospace;
+  
+  --font-normal: 13px;
+  --font-small: 12px;
+  --font-smaller: 11px;
+  
+  --line-height-normal: 20px;
+  --line-width: 120ch;
+}
+
+/* === Color Scheme === */
+.theme-dark, .theme-light.is-translucent {
+  --background-primary: #1e1e1e;
+  --background-secondary: #252525;
+  --background-tertiary: #2d2d2d;
+  --background-modifier-border: #3a3a3a;
+  
+  --text-normal: #d4d4d4;
+  --text-muted: #888888;
+  --text-faint: #666666;
+  
+  --interactive-normal: #313131;
+  --interactive-hover: #3a3a3a;
+  --interactive-accent: #23BB7F;
+  --interactive-accent-hover: #99FFE4;
+  
+  --scrollbar-bg: transparent;
+  --scrollbar-thumb-bg: #3a3a3a;
+  
+  --h1-color: #d4d4d4;
+  --h2-color: #d4d4d4;
+  --h3-color: #d4d4d4;
+  --h4-color: #d4d4d4;
+  --h5-color: #d4d4d4;
+  --h6-color: #d4d4d4;
+}
+
+/* === Borders and Dividers === */
+.workspace-tab-header-container,
+.workspace-split.mod-root,
+.workspace-leaf,
+.workspace-split,
+.nav-header,
+.nav-buttons-container,
+.nav-folder-title,
+.nav-file-title,
+.search-result-file-title,
+.workspace-tab-header {
+  border-color: var(--background-modifier-border) !important;
+}
+
+.workspace-ribbon {
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+.workspace-ribbon.mod-left:not(.is-collapsed) + .mod-root {
+  border-left: 1px solid var(--background-modifier-border);
+}
+
+.workspace-split.mod-root .view-content {
+  border-top: 1px solid var(--background-modifier-border);
+}
+
+/* === Line Numbers === */
+.cm-lineNumbers .cm-gutterElement {
+  color: #3a3a3a !important;
+}
+
+.cm-lineNumbers .cm-gutterElement.cm-active {
+  color: #888888 !important;
+}
+
+/* === Scrollbars === */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-bg);
+  border-radius: 4px;
+}
+
+.markdown-source-view.mod-cm6 .cm-scroller::-webkit-scrollbar {
+  display: none;
+}
+
+/* === Text Editor Appearance === */
+.markdown-source-view .cm-content {
+  font-family: var(--font-editor);
+  font-size: var(--font-normal);
+  line-height: var(--line-height-normal);
+}
+
+.markdown-source-view .cm-line {
+  padding-left: 4px;
+  padding-right: 4px;
+  line-height: var(--line-height-normal);
+}
+
+/* Code blocks */
+.markdown-source-view .HyperMD-codeblock {
+  font-family: var(--font-monospace);
+  line-height: var(--line-height-normal);
+}
+
+/* === Navigation Elements === */
+.nav-file-title, .nav-folder-title {
+  color: var(--text-normal);
+  font-size: var(--font-normal);
+  font-weight: 400;
+  padding: 1px 5px 1px 18px;
+}
+
+.nav-file-title-content, .nav-folder-title-content {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nav-file-title:hover, .nav-folder-title:hover {
+  background-color: var(--interactive-hover);
+}
+
+/* === Git Decorations === */
+.nav-file-title.is-unsaved .nav-file-title-content::before {
+  content: "●";
+  color: #87c998;
+  margin-right: 5px;
+}
+
+.nav-file-title.is-modified .nav-file-title-content::before {
+  content: "●";
+  color: #c9b587;
+  margin-right: 5px;
+}
+
+.nav-file-title.is-deleted .nav-file-title-content::before {
+  content: "●";
+  color: #c98787;
+  margin-right: 5px;
+}
+
+/* === Syntax Highlighting === */
+.cm-s-obsidian .HyperMD-codeblock-begin,
+.cm-s-obsidian .HyperMD-codeblock-end,
+.cm-s-obsidian .HyperMD-codeblock {
+  color: #888888;
+}
+
+.markdown-rendered code {
+  color: #FFC799;
+  background-color: #2d2d2d;
+  font-family: var(--font-monospace);
+}
+
+.token.keyword {
+  color: #23BB7F;
+}
+
+.token.string {
+  color: #9adca8;
+}
+
+.token.function {
+  color: #99FFE4;
+}
+
+.token.comment {
+  color: #48585a;
+}
+
+/* === Clean UI Elements === */
+.workspace-tab-header {
+  border-radius: 0;
+  padding: 0 8px;
+  background-color: transparent;
+}
+
+.workspace-tab-header.is-active {
+  background-color: var(--interactive-normal);
+}
+
+/* === Cursor & Selection === */
+.cm-cursor {
+  border-left: 1px solid #888888 !important;
+}
+
+.cm-fat-cursor {
+  background-color: #23BB7F;
+  border: none !important;
+}
+
+.cm-activeLine {
+  background-color: #313131 !important;
+}
+
+.cm-selectionBackground {
+  background-color: rgba(35, 187, 127, 0.2) !important;
+}
+
+/* === Clean Reading Mode === */
+.markdown-rendered {
+  font-family: var(--font-text);
+  font-size: var(--font-normal);
+  line-height: var(--line-height-normal);
+  padding: 0 10px;
+}
+
+.markdown-rendered h1,
+.markdown-rendered h2,
+.markdown-rendered h3,
+.markdown-rendered h4,
+.markdown-rendered h5,
+.markdown-rendered h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+}
+
+/* === Tables === */
+.markdown-rendered table {
+  border-collapse: collapse;
+  margin: 1em 0;
+  overflow: hidden;
+}
+
+.markdown-rendered th {
+  background-color: var(--interactive-normal);
+  border: 1px solid var(--background-modifier-border);
+  padding: 6px 13px;
+}
+
+.markdown-rendered td {
+  border: 1px solid var(--background-modifier-border);
+  padding: 6px 13px;
+}
+
+/* === Animations === */
+.workspace-tab-header,
+.nav-file-title,
+.nav-folder-title,
+.suggestion-item {
+  transition: all 0.15s ease-in-out;
+}
+
+/* === Smooth Scrolling === */
+.markdown-source-view,
+.markdown-preview-view {
+  scroll-behavior: smooth;
+}
+
