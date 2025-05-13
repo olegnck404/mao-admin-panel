@@ -1,157 +1,67 @@
-# Адмін-панель для керування персоналом ресторану МАО
+# MAO Admin Panel
 
-Кваліфікаційна робота на підтвердження ступеня фахового молодшого бакалавра (ВСП «ППФК НТУ «ХПІ»).  
-Керівник роботи – **Кривцова Олена Павлівна**.
+Административная панель для управления системой MAO. Проект построен на принципах Clean Architecture с использованием React и TypeScript.
 
-## Функціонал
+## Быстрый старт
 
-- 🎨 Сучасний та чистий дизайн інтерфейсу
-- 🌓 Світла/темна тема
-- 📱 Повністю адаптивний дизайн
-- 🔒 Система автентифікації
-- 📊 Панель керування з аналітикою
-- ✅ Керування завданнями
-- 🕒 Відстеження відвідуваності
-- 🏆 Система винагород
-
-## Технічний стек
-
-- React 18
-- TypeScript
-- Vite
-- Material-UI (MUI)
-- React Router
-- date-fns
-
-## Початок роботи
-
-### Вимоги
-
-- Node.js 16+ 
-- npm або yarn
-
-### Встановлення
-
-1. Клонуйте репозиторій
 ```bash
-git clone https://github.com/olegnck404/mao-admin-panel.git
+# Клонирование репозитория
+
+git clone https://github.com/your-username/mao-admin-panel.git
 cd mao-admin-panel
-```
-
-2. Встановіть залежності
-```bash
 npm install
-# або
-yarn install
-```
-
-3. Запустіть сервер розробки
-```bash
 npm run dev
-# або
-yarn dev
 ```
 
-4. Відкрийте [http://localhost:5173](http://localhost:5173) у браузері
+## Структура проекта
 
-### Збірка проекту
+- `src/` — исходный код (domain, application, infrastructure, presentation)
+- `docs/` — подробная документация (архитектура, API, гайды)
+- `public/` — статические файлы
 
-```bash
-npm run build
-# або
-yarn build
+## Документация
+
+- [Полная документация](docs/FULL_DOCUMENTATION.md)
+- [Руководство разработчика](docs/development-guide.md)
+- [Архитектура](docs/ARCHITECTURE.md)
+- [API](docs/API.md)
+- [Ошибки](docs/errors.md)
+
+## CI/CD с GitHub Actions
+
+Для автоматизации сборки и тестирования используйте GitHub Actions. Пример workflow:
+
+```yaml
+name: Node.js CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.x"
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
 ```
 
-## Структура проекту
+## Внесение изменений
 
-```
-src/
-  ├── components/     # Компоненти багаторазового використання
-  ├── layouts/        # Компоненти макетів
-  ├── pages/          # Компоненти сторінок
-  ├── theme/          # Конфігурація теми MUI
-  ├── assets/         # Статичні ресурси
-  └── App.tsx         # Головний компонент додатку
-```
+1. Создайте новую ветку для изменений
+2. Покройте новый функционал тестами
+3. Сделайте осмысленный commit
+4. Откройте Pull Request
 
----
-
-# Admin Panel for MAO Restaurant Staff Management
-
-Bachelor's degree qualification work (SSU "PPFC NTU "KhPI"").  
-Project supervisor – **Olena Krivtsova**.
-
-## Features
-
-- 🎨 Modern and clean UI design
-- 🌓 Light/Dark mode
-- 📱 Fully responsive
-- 🔒 Authentication system
-- 📊 Dashboard with analytics
-- ✅ Task management
-- 🕒 Attendance tracking
-- 🏆 Rewards system
-
-## Tech Stack
-
-- React 18
-- TypeScript
-- Vite
-- Material-UI (MUI)
-- React Router
-- date-fns
-
-## Getting Started
-
-### Prerequisites
-
-- Node.js 16+ 
-- npm or yarn
-
-### Installation
-
-1. Clone the repository
-```bash
-git clone [your-repo-link]
-cd admin-panel
-```
-
-2. Install dependencies
-```bash
-npm install
-# or
-yarn install
-```
-
-3. Start the development server
-```bash
-npm run dev
-# or
-yarn dev
-```
-
-4. Open [http://localhost:5173](http://localhost:5173) in your browser
-
-### Build
-
-```bash
-npm run build
-# or
-yarn build
-```
-
-## Project Structure
-
-```
-src/
-  ├── components/     # Reusable components
-  ├── layouts/        # Layout components
-  ├── pages/          # Page components
-  ├── theme/          # MUI theme configuration
-  ├── assets/         # Static assets
-  └── App.tsx         # Main application component
-```
-
-## License
+## Лицензия
 
 MIT
