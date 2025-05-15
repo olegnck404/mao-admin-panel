@@ -1,26 +1,29 @@
 import { Request, Response } from 'express';
-import User from '../models/User';
+import User from '../models/User'; // Убедитесь, что этот путь корректен
 
-export const getUsers = async (req: Request, res: Response) => {
+export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await User.find();
     res.json(users);
   } catch (error) {
+    // Рекомендуется также типизировать ошибку, если возможно: error: any или error: unknown
     res.status(500).json({ message: 'Server error', error });
   }
 };
 
-export const createUser = async (req: Request, res: Response) => {
+export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { name, email } = req.body;
 
     if (!name || !email) {
-      return res.status(400).json({ message: 'Name and email are required' });
+      res.status(400).json({ message: 'Name and email are required' });
+      return; // Важно добавить return для выхода из функции
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(409).json({ message: 'User with this email already exists' });
+      res.status(409).json({ message: 'User with this email already exists' });
+      return; // Важно добавить return
     }
 
     const user = new User({ name, email });
@@ -31,13 +34,14 @@ export const createUser = async (req: Request, res: Response) => {
   }
 };
 
-export const deleteUser = async (req: Request, res: Response) => {
+export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
     const deleted = await User.findByIdAndDelete(userId);
 
     if (!deleted) {
-      return res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found' });
+      return; // Важно добавить return
     }
 
     res.status(204).send();
@@ -45,13 +49,15 @@ export const deleteUser = async (req: Request, res: Response) => {
     res.status(500).json({ message: 'Server error', error });
   }
 };
-export const getUserById = async (req: Request, res: Response) => {
+
+export const getUserById = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      res.status(404).json({ message: 'User not found' });
+      return; // Важно добавить return
     }
 
     res.json(user);
