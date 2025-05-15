@@ -4,8 +4,8 @@ import { connectDB } from './config/db'; // импорт подключения 
 import errorHandler from './middlewares/errorHandler';
 import attendanceRoutes from './routes/attendance.routes';
 import rewardsFinesRouter from './routes/rewardsFines';
+import taskRouter from './routes/task.routes';
 import userRoutes from './routes/user.routes';
-
 
 const app = express();
 
@@ -19,6 +19,7 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/rewards-fines', rewardsFinesRouter);
 app.use('/api/attendance', attendanceRoutes);
+app.use('/api/task', taskRouter);
 
 // Корневой маршрут для проверки работы API
 app.get('/', (req, res) => {
