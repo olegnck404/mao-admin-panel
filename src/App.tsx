@@ -1,5 +1,6 @@
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
+import { SnackbarProvider } from "notistack";
 import { useEffect, useState } from "react";
 import { BrowserRouter, useRoutes } from "react-router-dom";
 import { AuthContext } from "./contexts/AuthContext";
@@ -44,7 +45,12 @@ export default function App() {
         <ThemeContext.Provider value={{ mode, toggleTheme }}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
-            <AppRoutes />
+            <SnackbarProvider
+              maxSnack={3}
+              anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+            >
+              <AppRoutes />
+            </SnackbarProvider>
           </ThemeProvider>
         </ThemeContext.Provider>
       </AuthContext.Provider>

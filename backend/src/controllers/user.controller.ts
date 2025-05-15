@@ -12,24 +12,24 @@ export const getUsers = async (req: Request, res: Response): Promise<void> => {
 
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { name, email } = req.body;
+    const { name, email, role, password } = req.body;
 
-    if (!name || !email) {
-      res.status(400).json({ message: 'Name and email are required' });
+    if (!name || !email || !password || !role) {
+      res.status(400).json({ message: 'All fields are required' });
       return;
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
-      res.status(409).json({ message: 'User with this email already exists' });
+      res.status(409).json({ message: 'User already exists' });
       return;
     }
 
-    const user = new User({ name, email });
+    const user = new User({ name, email, role, password });
     await user.save();
     res.status(201).json(user);
-  } catch (error) {
-    res.status(500).json({ message: 'Server error', error });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
   }
 };
 

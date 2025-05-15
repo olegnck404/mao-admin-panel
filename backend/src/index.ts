@@ -11,15 +11,18 @@ app.use(express.json());
 
 app.use('/api/users', userRoutes);
 
-mongoose.connect('mongodb://localhost:27017/your-db-name', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-  .then(() => {
+async function startServer() {
+  try {
+    await mongoose.connect('mongodb://localhost:27017/your-db-name');
+    console.log('MongoDB connected');
+
     app.listen(PORT, () => {
-      console.log(`Сервер запущен на порту ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error('Ошибка подключения к MongoDB:', error);
-  });
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+    process.exit(1);
+  }
+}
+
+startServer();

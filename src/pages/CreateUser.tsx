@@ -1,125 +1,81 @@
-import {
-  Alert,
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Box, Button, MenuItem, TextField, Typography } from "@mui/material";
+import axios from "axios";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 
 export default function CreateUser() {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    password: "",
     role: "user",
+    password: "",
   });
 
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleChange = (field: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
+  const handleChange = (key: string, value: string) => {
+    setFormData({ ...formData, [key]: value });
   };
 
-  const handleSubmit = async () => {
-    if (!formData.name || !formData.email || !formData.password) {
-      setError("All fields are required.");
-      setSuccess(false);
-      return;
-    }
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
     try {
-      const response = await fetch("http://localhost:5000/api/users", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.message || "Failed to create user");
-      }
-
-      setSuccess(true);
-      setError(null);
-      setFormData({ name: "", email: "", password: "", role: "user" });
-    } catch (err: any) {
-      setError(err.message);
-      setSuccess(false);
+      await axios.post("http://localhost:4000/api/users", formData);
+      enqueueSnackbar("User created successfully!", { variant: "success" });
+      setFormData({ name: "", email: "", role: "user", password: "" });
+    } catch (error: any) {
+      enqueueSnackbar(
+        error.response?.data?.message || "Failed to create user.",
+        { variant: "error" }
+      );
     }
   };
 
   return (
-    <Box sx={{ maxWidth: 600, mx: "auto", mt: 6, px: 2 }}>
-      <Typography variant="h5" fontWeight={600} gutterBottom>
+    <Box sx={{ maxWidth: 500, mx: "auto", mt: 5 }}>
+      <Typography variant="h5" fontWeight={600} mb={3}>
         Create New User
       </Typography>
-
-      {success && (
-        <Alert severity="success" sx={{ my: 2 }}>
-          User created successfully!
-        </Alert>
-      )}
-      {error && (
-        <Alert severity="error" sx={{ my: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      <Box display="flex" flexDirection="column" gap={3} mt={4}>
+      <form onSubmit={handleSubmit}>
         <TextField
+          fullWidth
           label="Name"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
-          fullWidth
+          sx={{ mb: 2 }}
         />
         <TextField
+          fullWidth
           label="Email"
-          type="email"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
-          fullWidth
+          sx={{ mb: 2 }}
         />
         <TextField
+          select
+          fullWidth
+          label="Role"
+          value={formData.role}
+          onChange={(e) => handleChange("role", e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          <MenuItem value="user">User</MenuItem>
+          <MenuItem value="admin">Admin</MenuItem>
+          <MenuItem value="manager">Manager</MenuItem>
+        </TextField>
+        <TextField
+          fullWidth
           label="Password"
           type="password"
           value={formData.password}
           onChange={(e) => handleChange("password", e.target.value)}
-          fullWidth
+          sx={{ mb: 3 }}
         />
-        <FormControl fullWidth>
-          <InputLabel>Role</InputLabel>
-          <Select
-            value={formData.role}
-            label="Role"
-            onChange={(e) => handleChange("role", e.target.value)}
-          >
-            {["user", "admin", "manager"].map((role) => (
-              <MenuItem
-                key={role}
-                value={role}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "primary.light",
-                    color: "white",
-                  },
-                }}
-              >
-                {role.charAt(0).toUpperCase() + role.slice(1)}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-
-        <Button variant="contained" onClick={handleSubmit}>
+        <Button type="submit" variant="contained" fullWidth>
           Create User
         </Button>
-      </Box>
+      </form>
     </Box>
   );
 }
