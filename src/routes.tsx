@@ -1,3 +1,4 @@
+import UsersList from "@pages/UsersList";
 import { Navigate, Outlet, RouteObject } from "react-router-dom";
 import Layout from "./components/Layout";
 import { ProtectedRoute } from "./contexts/AuthContext";
@@ -38,6 +39,10 @@ export const routes: RouteObject[] = [
       {
         path: "create-user",
         element: <CreateUser />,
+      },
+      {
+        path: "users-list",
+        element: <UsersList />,
       },
     ],
   },

@@ -9,6 +9,7 @@ import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
 import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
 import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
+
 import {
   AppBar,
   Avatar,
@@ -35,9 +36,11 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
+
 import { keyframes } from "@mui/system";
 import { ReactNode, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../contexts/AuthContext";
 import { useThemeMode } from "../contexts/ThemeContext";
 
@@ -76,6 +79,11 @@ const menuItems = [
     icon: <PersonAddRoundedIcon />,
     path: "/mao-admin-panel/create-user",
   },
+  {
+    text: "Users List",
+    icon: <EmojiEventsRoundedIcon />,
+    path: "/mao-admin-panel/users-list",
+  }, // новый пункт меню
 ];
 
 type LayoutProps = {
@@ -104,8 +112,8 @@ export default function Layout({ children }: LayoutProps) {
 
   const handleSearch = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
-      // Handle search
       setSearchAnchor(null);
+      // реализуй логику поиска, если нужна
     }
   };
 
@@ -132,6 +140,7 @@ export default function Layout({ children }: LayoutProps) {
 
   const drawer = (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Верхняя часть - аватар и имя */}
       <Box
         sx={{
           p: 2,
@@ -170,6 +179,7 @@ export default function Layout({ children }: LayoutProps) {
         </Typography>
       </Box>
 
+      {/* Список пунктов меню */}
       <List sx={{ flex: 1, px: 1 }}>
         {menuItems.map((item, index) => (
           <ListItem
@@ -240,6 +250,7 @@ export default function Layout({ children }: LayoutProps) {
         ))}
       </List>
 
+      {/* Нижняя панель с переключателем темы */}
       <Box
         sx={{
           p: 2,
@@ -267,6 +278,7 @@ export default function Layout({ children }: LayoutProps) {
         </Box>
       </Box>
 
+      {/* Меню пользователя */}
       <Menu
         anchorEl={userMenuAnchor}
         open={Boolean(userMenuAnchor)}
@@ -398,29 +410,11 @@ export default function Layout({ children }: LayoutProps) {
         open={Boolean(searchAnchor)}
         anchorEl={searchAnchor}
         onClose={() => setSearchAnchor(null)}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          sx: {
-            width: 320,
-            mt: 1,
-          },
-        }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{ sx: { width: 320, mt: 1 } }}
       >
-        <Paper
-          sx={{
-            p: 2,
-            display: "flex",
-            alignItems: "center",
-            gap: 1,
-          }}
-        >
+        <Paper sx={{ p: 2, display: "flex", alignItems: "center", gap: 1 }}>
           <SearchRoundedIcon sx={{ color: "neutral.main" }} />
           <InputBase
             autoFocus
@@ -430,10 +424,7 @@ export default function Layout({ children }: LayoutProps) {
             onKeyPress={handleSearch}
             sx={{
               flex: 1,
-              "& input": {
-                typography: "body1",
-                letterSpacing: "-0.011em",
-              },
+              "& input": { typography: "body1", letterSpacing: "-0.011em" },
             }}
           />
         </Paper>
@@ -443,21 +434,9 @@ export default function Layout({ children }: LayoutProps) {
         open={Boolean(notificationsAnchor)}
         anchorEl={notificationsAnchor}
         onClose={() => setNotificationsAnchor(null)}
-        anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "right",
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-        PaperProps={{
-          sx: {
-            width: 320,
-            maxHeight: 400,
-            mt: 1,
-          },
-        }}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        PaperProps={{ sx: { width: 320, maxHeight: 400, mt: 1 } }}
       >
         <Box sx={{ p: 2 }}>
           <Typography variant="subtitle1" fontWeight={600} sx={{ mb: 2 }}>
@@ -467,12 +446,7 @@ export default function Layout({ children }: LayoutProps) {
             {notifications.map((notification, index) => (
               <ListItem
                 key={notification.id}
-                sx={{
-                  px: 0,
-                  "&:not(:last-child)": {
-                    mb: 1,
-                  },
-                }}
+                sx={{ px: 0, "&:not(:last-child)": { mb: 1 } }}
               >
                 <Box sx={{ width: "100%" }}>
                   <Box
@@ -510,9 +484,7 @@ export default function Layout({ children }: LayoutProps) {
           variant="temporary"
           open={mobileOpen}
           onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true,
-          }}
+          ModalProps={{ keepMounted: true }}
           sx={{
             display: { xs: "block", sm: "none" },
             "& .MuiDrawer-paper": {
@@ -537,6 +509,7 @@ export default function Layout({ children }: LayoutProps) {
           {drawer}
         </Drawer>
       </Box>
+
       <Box
         component="main"
         sx={{

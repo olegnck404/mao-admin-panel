@@ -1,14 +1,14 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
-interface IRewardFine extends Document {
+export interface IRewardFine extends Document {
   employeeName: string;
   date: Date;
   type: 'reward' | 'penalty';
   amount: number;
-  reason: string;
+  reason?: string;
 }
 
-const RewardFineSchema = new Schema<IRewardFine>({
+const RewardFineSchema: Schema = new Schema({
   employeeName: { type: String, required: true },
   date: { type: Date, required: true },
   type: { type: String, enum: ['reward', 'penalty'], required: true },
@@ -16,4 +16,6 @@ const RewardFineSchema = new Schema<IRewardFine>({
   reason: { type: String },
 });
 
-export default mongoose.model<IRewardFine>('RewardFine', RewardFineSchema);
+const RewardFine = mongoose.model<IRewardFine>('RewardFine', RewardFineSchema);
+
+export default RewardFine;

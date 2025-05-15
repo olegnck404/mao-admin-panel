@@ -46,6 +46,11 @@ interface RewardRecord {
   reason: string;
 }
 
+interface Employee {
+  _id: string;
+  name: string;
+}
+
 export default function Rewards() {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
@@ -63,6 +68,11 @@ export default function Rewards() {
   });
   const [searchQuery, setSearchQuery] = useState("");
 
+  // Новый стейт для сотрудников
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  const [loadingEmployees, setLoadingEmployees] = useState(false);
+
+  // Загрузка записей
   useEffect(() => {
     async function fetchRecords() {
       setLoading(true);
@@ -79,6 +89,22 @@ export default function Rewards() {
       }
     }
     fetchRecords();
+  }, [enqueueSnackbar]);
+
+  // Загрузка сотрудников для dropdown
+  useEffect(() => {
+    async function fetchEmployees() {
+      setLoadingEmployees(true);
+      try {
+        const res = await axios.get<Employee[]>("/api/users");
+        setEmployees(res.data);
+      } catch {
+        enqueueSnackbar("Failed to load employees", { variant: "error" });
+      } finally {
+        setLoadingEmployees(false);
+      }
+    }
+    fetchEmployees();
   }, [enqueueSnackbar]);
 
   const handleOpen = () => setOpen(true);
@@ -148,6 +174,7 @@ export default function Rewards() {
 
   return (
     <Box>
+      {/* Заголовок, поиск, кнопки */}
       <Box
         sx={{
           display: "flex",
@@ -192,6 +219,7 @@ export default function Rewards() {
         </Box>
       </Box>
 
+      {/* Состояния загрузки */}
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
           <CircularProgress />
@@ -202,7 +230,9 @@ export default function Rewards() {
         </Typography>
       ) : (
         <>
+          {/* Статистика */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+            {/* ... Статистика (без изменений) */}
             <Paper
               sx={{ p: 3, flex: 1, position: "relative", overflow: "hidden" }}
             >
@@ -243,6 +273,7 @@ export default function Rewards() {
                 <TrendingUpIcon sx={{ fontSize: 80, color: "primary.main" }} />
               </Box>
             </Paper>
+            {/* ... Total Penalties и Net Balance (как раньше) */}
             <Paper
               sx={{ p: 3, flex: 1, position: "relative", overflow: "hidden" }}
             >
@@ -314,6 +345,7 @@ export default function Rewards() {
             </Paper>
           </Box>
 
+          {/* Таблица записей */}
           <Paper>
             <TableContainer>
               <Table>
@@ -385,6 +417,7 @@ export default function Rewards() {
         </>
       )}
 
+      {/* Диалог добавления записи */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -398,16 +431,24 @@ export default function Rewards() {
           </Typography>
         </DialogTitle>
         <DialogContent sx={{ pb: 2 }}>
-          <TextField
-            autoFocus
-            margin="dense"
-            label="Employee Name"
-            fullWidth
-            value={newRecord.employeeName}
-            onChange={(e) =>
-              setNewRecord({ ...newRecord, employeeName: e.target.value })
-            }
-          />
+          {/* Заменили текстовое поле на Select с сотрудниками */}
+          <FormControl fullWidth margin="dense" disabled={loadingEmployees}>
+            <InputLabel>Employee Name</InputLabel>
+            <Select
+              value={newRecord.employeeName || ""}
+              label="Employee Name"
+              onChange={(e) =>
+                setNewRecord({ ...newRecord, employeeName: e.target.value })
+              }
+            >
+              {employees.map((emp) => (
+                <MenuItem key={emp._id} value={emp.name}>
+                  {emp.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <LocalizationProvider dateAdapter={AdapterDateFns}>
             <DatePicker
               label="Date"
@@ -416,6 +457,7 @@ export default function Rewards() {
               slotProps={{ textField: { fullWidth: true, margin: "dense" } }}
             />
           </LocalizationProvider>
+
           <FormControl fullWidth margin="dense">
             <InputLabel>Type</InputLabel>
             <Select
@@ -432,6 +474,7 @@ export default function Rewards() {
               <MenuItem value="penalty">Penalty</MenuItem>
             </Select>
           </FormControl>
+
           <TextField
             margin="dense"
             label="Amount"
@@ -448,6 +491,7 @@ export default function Rewards() {
               startAdornment: <Typography sx={{ mr: 1 }}>$</Typography>,
             }}
           />
+
           <TextField
             margin="dense"
             label="Reason"
@@ -460,6 +504,7 @@ export default function Rewards() {
             }
           />
         </DialogContent>
+
         <DialogActions sx={{ px: 3, pb: 3 }}>
           <Button onClick={handleClose} variant="outlined">
             Cancel
