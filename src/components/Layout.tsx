@@ -1,44 +1,45 @@
-import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
-import DarkModeRoundedIcon from '@mui/icons-material/DarkModeRounded';
-import EmojiEventsRoundedIcon from '@mui/icons-material/EmojiEventsRounded';
-import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
-import HomeRoundedIcon from '@mui/icons-material/HomeRounded';
-import LightModeRoundedIcon from '@mui/icons-material/LightModeRounded';
-import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
-import NotificationsRoundedIcon from '@mui/icons-material/NotificationsRounded';
-import SearchRoundedIcon from '@mui/icons-material/SearchRounded';
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
+import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
+import EmojiEventsRoundedIcon from "@mui/icons-material/EmojiEventsRounded";
+import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
+import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
+import LightModeRoundedIcon from "@mui/icons-material/LightModeRounded";
+import LogoutRoundedIcon from "@mui/icons-material/LogoutRounded";
+import MenuRoundedIcon from "@mui/icons-material/MenuRounded";
+import NotificationsRoundedIcon from "@mui/icons-material/NotificationsRounded";
+import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
+import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import {
-    AppBar,
-    Avatar,
-    Badge,
-    Box,
-    CssBaseline,
-    Divider,
-    Drawer,
-    IconButton,
-    InputBase,
-    List,
-    ListItem,
-    ListItemButton,
-    ListItemIcon,
-    ListItemText,
-    Menu,
-    MenuItem,
-    Paper,
-    Popover,
-    Switch,
-    Toolbar,
-    Tooltip,
-    Typography,
-    useMediaQuery,
-    useTheme,
-} from '@mui/material';
-import { keyframes } from '@mui/system';
-import { ReactNode, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { useThemeMode } from '../contexts/ThemeContext';
+  AppBar,
+  Avatar,
+  Badge,
+  Box,
+  CssBaseline,
+  Divider,
+  Drawer,
+  IconButton,
+  InputBase,
+  List,
+  ListItem,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Menu,
+  MenuItem,
+  Paper,
+  Popover,
+  Switch,
+  Toolbar,
+  Tooltip,
+  Typography,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import { keyframes } from "@mui/system";
+import { ReactNode, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../contexts/AuthContext";
+import { useThemeMode } from "../contexts/ThemeContext";
 
 const drawerWidth = 280;
 
@@ -54,10 +55,27 @@ const fadeIn = keyframes`
 `;
 
 const menuItems = [
-  { text: 'Dashboard', icon: <HomeRoundedIcon />, path: '/mao-admin-panel' },
-  { text: 'Tasks', icon: <FormatListBulletedRoundedIcon />, path: '/mao-admin-panel/tasks' },
-  { text: 'Attendance', icon: <AccessTimeRoundedIcon />, path: '/mao-admin-panel/attendance' },
-  { text: 'Rewards', icon: <EmojiEventsRoundedIcon />, path: '/mao-admin-panel/rewards' },
+  { text: "Dashboard", icon: <HomeRoundedIcon />, path: "/mao-admin-panel" },
+  {
+    text: "Tasks",
+    icon: <FormatListBulletedRoundedIcon />,
+    path: "/mao-admin-panel/tasks",
+  },
+  {
+    text: "Attendance",
+    icon: <AccessTimeRoundedIcon />,
+    path: "/mao-admin-panel/attendance",
+  },
+  {
+    text: "Rewards",
+    icon: <EmojiEventsRoundedIcon />,
+    path: "/mao-admin-panel/rewards",
+  },
+  {
+    text: "Create User",
+    icon: <PersonAddRoundedIcon />,
+    path: "/mao-admin-panel/create-user",
+  },
 ];
 
 type LayoutProps = {
@@ -68,12 +86,15 @@ export default function Layout({ children }: LayoutProps) {
   const theme = useTheme();
   const { mode, toggleTheme } = useThemeMode();
   const { logout } = useAuth();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchAnchor, setSearchAnchor] = useState<null | HTMLElement>(null);
-  const [notificationsAnchor, setNotificationsAnchor] = useState<null | HTMLElement>(null);
-  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [notificationsAnchor, setNotificationsAnchor] =
+    useState<null | HTMLElement>(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState<null | HTMLElement>(
+    null
+  );
+  const [searchQuery, setSearchQuery] = useState("");
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -82,49 +103,69 @@ export default function Layout({ children }: LayoutProps) {
   };
 
   const handleSearch = (event: React.KeyboardEvent) => {
-    if (event.key === 'Enter') {
+    if (event.key === "Enter") {
       // Handle search
       setSearchAnchor(null);
     }
   };
 
   const notifications = [
-    { id: 1, title: 'New Task Assigned', message: 'You have a new task to review', time: '5m ago' },
-    { id: 2, title: 'Meeting Reminder', message: 'Team meeting in 30 minutes', time: '30m ago' },
-    { id: 3, title: 'Project Update', message: 'Project status has been updated', time: '1h ago' },
+    {
+      id: 1,
+      title: "New Task Assigned",
+      message: "You have a new task to review",
+      time: "5m ago",
+    },
+    {
+      id: 2,
+      title: "Meeting Reminder",
+      message: "Team meeting in 30 minutes",
+      time: "30m ago",
+    },
+    {
+      id: 3,
+      title: "Project Update",
+      message: "Project status has been updated",
+      time: "1h ago",
+    },
   ];
 
   const drawer = (
-    <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <Box
         sx={{
           p: 2,
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 2,
           borderBottom: `1px solid ${theme.palette.divider}`,
-          backdropFilter: 'blur(10px)',
-          backgroundColor: mode === 'light'
-            ? 'rgba(255, 255, 255, 0.5)'
-            : 'rgba(44, 44, 46, 0.5)',
+          backdropFilter: "blur(10px)",
+          backgroundColor:
+            mode === "light"
+              ? "rgba(255, 255, 255, 0.5)"
+              : "rgba(44, 44, 46, 0.5)",
         }}
       >
         <Avatar
           sx={{
             width: 40,
             height: 40,
-            bgcolor: 'primary.main',
-            cursor: 'pointer',
-            transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-            '&:hover': {
-              transform: 'scale(1.05)',
+            bgcolor: "primary.main",
+            cursor: "pointer",
+            transition: "transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+            "&:hover": {
+              transform: "scale(1.05)",
             },
           }}
           onClick={(e) => setUserMenuAnchor(e.currentTarget)}
         >
           R
         </Avatar>
-        <Typography variant="subtitle1" fontWeight="600" sx={{ letterSpacing: '-0.025em' }}>
+        <Typography
+          variant="subtitle1"
+          fontWeight="600"
+          sx={{ letterSpacing: "-0.025em" }}
+        >
           Restaurant Admin
         </Typography>
       </Box>
@@ -148,29 +189,35 @@ export default function Layout({ children }: LayoutProps) {
               }}
               sx={{
                 borderRadius: 2,
-                transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                '&.Mui-selected': {
-                  backgroundColor: mode === 'light'
-                    ? 'rgba(0, 122, 255, 0.08)'
-                    : 'rgba(10, 132, 255, 0.08)',
-                  backdropFilter: 'blur(8px)',
-                  '&:hover': {
-                    backgroundColor: mode === 'light'
-                      ? 'rgba(0, 122, 255, 0.12)'
-                      : 'rgba(10, 132, 255, 0.12)',
+                transition: "all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                "&.Mui-selected": {
+                  backgroundColor:
+                    mode === "light"
+                      ? "rgba(0, 122, 255, 0.08)"
+                      : "rgba(10, 132, 255, 0.08)",
+                  backdropFilter: "blur(8px)",
+                  "&:hover": {
+                    backgroundColor:
+                      mode === "light"
+                        ? "rgba(0, 122, 255, 0.12)"
+                        : "rgba(10, 132, 255, 0.12)",
                   },
                 },
-                '&:hover': {
-                  transform: 'translateX(4px)',
+                "&:hover": {
+                  transform: "translateX(4px)",
                 },
               }}
             >
               <ListItemIcon
                 sx={{
-                  color: location.pathname === item.path ? 'primary.main' : 'neutral.main',
+                  color:
+                    location.pathname === item.path
+                      ? "primary.main"
+                      : "neutral.main",
                   minWidth: 40,
-                  transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                  transform: location.pathname === item.path ? 'scale(1.1)' : 'scale(1)',
+                  transition: "transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  transform:
+                    location.pathname === item.path ? "scale(1.1)" : "scale(1)",
                 }}
               >
                 {item.icon}
@@ -178,10 +225,13 @@ export default function Layout({ children }: LayoutProps) {
               <ListItemText
                 primary={item.text}
                 sx={{
-                  '& .MuiListItemText-primary': {
+                  "& .MuiListItemText-primary": {
                     fontWeight: location.pathname === item.path ? 600 : 400,
-                    color: location.pathname === item.path ? 'primary.main' : 'text.primary',
-                    letterSpacing: '-0.025em',
+                    color:
+                      location.pathname === item.path
+                        ? "primary.main"
+                        : "text.primary",
+                    letterSpacing: "-0.025em",
                   },
                 }}
               />
@@ -193,27 +243,27 @@ export default function Layout({ children }: LayoutProps) {
       <Box
         sx={{
           p: 2,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
           borderTop: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <LightModeRoundedIcon sx={{ color: 'neutral.main' }} />
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <LightModeRoundedIcon sx={{ color: "neutral.main" }} />
           <Switch
-            checked={mode === 'dark'}
+            checked={mode === "dark"}
             onChange={toggleTheme}
             sx={{
-              '& .MuiSwitch-switchBase.Mui-checked': {
-                color: 'primary.main',
+              "& .MuiSwitch-switchBase.Mui-checked": {
+                color: "primary.main",
               },
-              '& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track': {
-                backgroundColor: 'primary.main',
+              "& .MuiSwitch-switchBase.Mui-checked + .MuiSwitch-track": {
+                backgroundColor: "primary.main",
               },
             }}
           />
-          <DarkModeRoundedIcon sx={{ color: 'neutral.main' }} />
+          <DarkModeRoundedIcon sx={{ color: "neutral.main" }} />
         </Box>
       </Box>
 
@@ -224,23 +274,23 @@ export default function Layout({ children }: LayoutProps) {
         PaperProps={{
           elevation: 0,
           sx: {
-            overflow: 'visible',
-            filter: 'drop-shadow(0px 2px 8px rgba(0,0,0,0.1))',
+            overflow: "visible",
+            filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.1))",
             mt: 1.5,
-            '& .MuiMenuItem-root': {
+            "& .MuiMenuItem-root": {
               px: 2,
               py: 1,
               borderRadius: 1,
               mx: 0.5,
               mb: 0.5,
-              typography: 'body2',
+              typography: "body2",
               fontWeight: 500,
-              letterSpacing: '-0.011em',
+              letterSpacing: "-0.011em",
             },
           },
         }}
-        transformOrigin={{ horizontal: 'left', vertical: 'top' }}
-        anchorOrigin={{ horizontal: 'left', vertical: 'bottom' }}
+        transformOrigin={{ horizontal: "left", vertical: "top" }}
+        anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
       >
         <MenuItem onClick={logout}>
           <ListItemIcon>
@@ -253,7 +303,13 @@ export default function Layout({ children }: LayoutProps) {
   );
 
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: 'background.default' }}>
+    <Box
+      sx={{
+        display: "flex",
+        minHeight: "100vh",
+        bgcolor: "background.default",
+      }}
+    >
       <CssBaseline />
       <AppBar
         position="fixed"
@@ -261,13 +317,13 @@ export default function Layout({ children }: LayoutProps) {
         sx={{
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           ml: { sm: `${drawerWidth}px` },
-          bgcolor: 'background.paper',
+          bgcolor: "background.paper",
           borderBottom: `1px solid ${theme.palette.divider}`,
-          backdropFilter: 'blur(25px) saturate(200%)',
+          backdropFilter: "blur(25px) saturate(200%)",
         }}
       >
-        <Toolbar sx={{ justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Toolbar sx={{ justifyContent: "space-between" }}>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
             <IconButton
               color="inherit"
               aria-label="open drawer"
@@ -275,10 +331,10 @@ export default function Layout({ children }: LayoutProps) {
               onClick={handleDrawerToggle}
               sx={{
                 mr: 2,
-                display: { sm: 'none' },
-                transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                '&:hover': {
-                  transform: 'scale(1.1)',
+                display: { sm: "none" },
+                transition: "transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                "&:hover": {
+                  transform: "scale(1.1)",
                 },
               }}
             >
@@ -289,26 +345,27 @@ export default function Layout({ children }: LayoutProps) {
               noWrap
               component="div"
               sx={{
-                color: 'text.primary',
+                color: "text.primary",
                 fontWeight: 600,
-                letterSpacing: '-0.025em',
+                letterSpacing: "-0.025em",
                 animation: `${fadeIn} 0.3s ease-out`,
               }}
             >
-              {menuItems.find((item) => item.path === location.pathname)?.text || 'Dashboard'}
+              {menuItems.find((item) => item.path === location.pathname)
+                ?.text || "Dashboard"}
             </Typography>
           </Box>
 
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
             <Tooltip title="Search">
               <IconButton
                 onClick={(e) => setSearchAnchor(e.currentTarget)}
                 sx={{
-                  color: 'neutral.main',
-                  transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                  '&:hover': {
-                    transform: 'scale(1.1)',
-                    color: 'primary.main',
+                  color: "neutral.main",
+                  transition: "all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  "&:hover": {
+                    transform: "scale(1.1)",
+                    color: "primary.main",
                   },
                 }}
               >
@@ -320,11 +377,11 @@ export default function Layout({ children }: LayoutProps) {
               <IconButton
                 onClick={(e) => setNotificationsAnchor(e.currentTarget)}
                 sx={{
-                  color: 'neutral.main',
-                  transition: 'all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)',
-                  '&:hover': {
-                    transform: 'scale(1.1)',
-                    color: 'primary.main',
+                  color: "neutral.main",
+                  transition: "all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1)",
+                  "&:hover": {
+                    transform: "scale(1.1)",
+                    color: "primary.main",
                   },
                 }}
               >
@@ -342,12 +399,12 @@ export default function Layout({ children }: LayoutProps) {
         anchorEl={searchAnchor}
         onClose={() => setSearchAnchor(null)}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         PaperProps={{
           sx: {
@@ -359,12 +416,12 @@ export default function Layout({ children }: LayoutProps) {
         <Paper
           sx={{
             p: 2,
-            display: 'flex',
-            alignItems: 'center',
+            display: "flex",
+            alignItems: "center",
             gap: 1,
           }}
         >
-          <SearchRoundedIcon sx={{ color: 'neutral.main' }} />
+          <SearchRoundedIcon sx={{ color: "neutral.main" }} />
           <InputBase
             autoFocus
             placeholder="Search..."
@@ -373,9 +430,9 @@ export default function Layout({ children }: LayoutProps) {
             onKeyPress={handleSearch}
             sx={{
               flex: 1,
-              '& input': {
-                typography: 'body1',
-                letterSpacing: '-0.011em',
+              "& input": {
+                typography: "body1",
+                letterSpacing: "-0.011em",
               },
             }}
           />
@@ -387,12 +444,12 @@ export default function Layout({ children }: LayoutProps) {
         anchorEl={notificationsAnchor}
         onClose={() => setNotificationsAnchor(null)}
         anchorOrigin={{
-          vertical: 'bottom',
-          horizontal: 'right',
+          vertical: "bottom",
+          horizontal: "right",
         }}
         transformOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
+          vertical: "top",
+          horizontal: "right",
         }}
         PaperProps={{
           sx: {
@@ -412,13 +469,19 @@ export default function Layout({ children }: LayoutProps) {
                 key={notification.id}
                 sx={{
                   px: 0,
-                  '&:not(:last-child)': {
+                  "&:not(:last-child)": {
                     mb: 1,
                   },
                 }}
               >
-                <Box sx={{ width: '100%' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 0.5 }}>
+                <Box sx={{ width: "100%" }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      mb: 0.5,
+                    }}
+                  >
                     <Typography variant="subtitle2" fontWeight={600}>
                       {notification.title}
                     </Typography>
@@ -451,9 +514,9 @@ export default function Layout({ children }: LayoutProps) {
             keepMounted: true,
           }}
           sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "block", sm: "none" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: drawerWidth,
             },
           }}
@@ -463,9 +526,9 @@ export default function Layout({ children }: LayoutProps) {
         <Drawer
           variant="permanent"
           sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': {
-              boxSizing: 'border-box',
+            display: { xs: "none", sm: "block" },
+            "& .MuiDrawer-paper": {
+              boxSizing: "border-box",
               width: drawerWidth,
             },
           }}
@@ -480,9 +543,9 @@ export default function Layout({ children }: LayoutProps) {
           flexGrow: 1,
           p: { xs: 2, sm: 3 },
           width: { sm: `calc(100% - ${drawerWidth}px)` },
-          minHeight: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
+          minHeight: "100vh",
+          display: "flex",
+          flexDirection: "column",
         }}
       >
         <Toolbar />

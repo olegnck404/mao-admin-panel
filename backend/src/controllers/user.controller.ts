@@ -1,12 +1,11 @@
 import { Request, Response } from 'express';
-import User from '../models/User'; // Убедитесь, что этот путь корректен
+import User from '../models/User';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
   try {
     const users = await User.find();
     res.json(users);
   } catch (error) {
-    // Рекомендуется также типизировать ошибку, если возможно: error: any или error: unknown
     res.status(500).json({ message: 'Server error', error });
   }
 };
@@ -17,13 +16,13 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
 
     if (!name || !email) {
       res.status(400).json({ message: 'Name and email are required' });
-      return; // Важно добавить return для выхода из функции
+      return;
     }
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
       res.status(409).json({ message: 'User with this email already exists' });
-      return; // Важно добавить return
+      return;
     }
 
     const user = new User({ name, email });
@@ -41,7 +40,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
 
     if (!deleted) {
       res.status(404).json({ message: 'User not found' });
-      return; // Важно добавить return
+      return;
     }
 
     res.status(204).send();
@@ -57,7 +56,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 
     if (!user) {
       res.status(404).json({ message: 'User not found' });
-      return; // Важно добавить return
+      return;
     }
 
     res.json(user);

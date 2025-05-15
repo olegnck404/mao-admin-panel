@@ -1,59 +1,53 @@
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
-import { BrowserRouter, useRoutes } from 'react-router-dom';
-import { AuthContext } from './contexts/AuthContext';
-import { ThemeContext } from './contexts/ThemeContext';
-import { routes } from './routes';
-import { darkTheme, lightTheme } from './theme';
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { useEffect, useState } from "react";
+import { BrowserRouter, useRoutes } from "react-router-dom";
+import { AuthContext } from "./contexts/AuthContext";
+import { ThemeContext } from "./contexts/ThemeContext";
+import { routes } from "./routes";
+import { darkTheme, lightTheme } from "./theme";
 
 function AppRoutes() {
-  const routing = useRoutes(routes);
-  return routing;
+  return useRoutes(routes);
 }
 
-function App() {
-  const [mode, setMode] = useState<'light' | 'dark'>(() => {
-    const savedMode = localStorage.getItem('themeMode');
-    if (savedMode === 'light' || savedMode === 'dark') {
-      return savedMode;
-    }
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+export default function App() {
+  const [mode, setMode] = useState<"light" | "dark">(() => {
+    const saved = localStorage.getItem("themeMode");
+    if (saved === "light" || saved === "dark") return saved;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches
+      ? "dark"
+      : "light";
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem('isAuthenticated') === 'true';
+    return localStorage.getItem("isAuthenticated") === "true";
   });
 
   useEffect(() => {
-    localStorage.setItem('themeMode', mode);
+    localStorage.setItem("themeMode", mode);
   }, [mode]);
 
   useEffect(() => {
-    localStorage.setItem('isAuthenticated', String(isAuthenticated));
+    localStorage.setItem("isAuthenticated", String(isAuthenticated));
   }, [isAuthenticated]);
 
-  const toggleTheme = () => {
-    setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-  };
-
+  const toggleTheme = () => setMode(mode === "light" ? "dark" : "light");
   const login = () => setIsAuthenticated(true);
   const logout = () => setIsAuthenticated(false);
 
-  const theme = mode === 'light' ? lightTheme : darkTheme;
+  const theme = mode === "light" ? lightTheme : darkTheme;
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
-      <ThemeContext.Provider value={{ mode, toggleTheme }}>
-        <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <BrowserRouter>
+    <BrowserRouter>
+      <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+        <ThemeContext.Provider value={{ mode, toggleTheme }}>
+          <ThemeProvider theme={theme}>
+            <CssBaseline />
             <AppRoutes />
-          </BrowserRouter>
-        </ThemeProvider>
-      </ThemeContext.Provider>
-    </AuthContext.Provider>
+          </ThemeProvider>
+        </ThemeContext.Provider>
+      </AuthContext.Provider>
+    </BrowserRouter>
   );
 }
-
-export default App;

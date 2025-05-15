@@ -1,15 +1,16 @@
-import { Navigate, Outlet, RouteObject } from 'react-router-dom';
-import Layout from './components/Layout';
-import { ProtectedRoute } from './contexts/AuthContext';
-import Attendance from './pages/Attendance';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Rewards from './pages/Rewards';
-import Tasks from './pages/Tasks';
+import { Navigate, Outlet, RouteObject } from "react-router-dom";
+import Layout from "./components/Layout";
+import { ProtectedRoute } from "./contexts/AuthContext";
+import Attendance from "./pages/Attendance";
+import CreateUser from "./pages/CreateUser";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Rewards from "./pages/Rewards";
+import Tasks from "./pages/Tasks";
 
 export const routes: RouteObject[] = [
   {
-    path: '/mao-admin-panel',
+    path: "/mao-admin-panel",
     element: (
       <ProtectedRoute>
         <Layout>
@@ -23,25 +24,29 @@ export const routes: RouteObject[] = [
         element: <Dashboard />,
       },
       {
-        path: 'tasks',
+        path: "tasks",
         element: <Tasks />,
       },
       {
-        path: 'attendance',
+        path: "attendance",
         element: <Attendance />,
       },
       {
-        path: 'rewards',
+        path: "rewards",
         element: <Rewards />,
+      },
+      {
+        path: "create-user",
+        element: <CreateUser />,
       },
     ],
   },
   {
-    path: '/mao-admin-panel/login',
+    path: "/mao-admin-panel/login",
     element: <Login />,
   },
   {
-    path: '*',
+    path: "*",
     element: <Navigate to="/mao-admin-panel" replace />,
   },
 ];
