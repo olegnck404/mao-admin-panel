@@ -2,8 +2,10 @@ import cors from 'cors';
 import express from 'express';
 import { connectDB } from './config/db'; // импорт подключения к БД
 import errorHandler from './middlewares/errorHandler';
+import attendanceRoutes from './routes/attendance.routes';
 import rewardsFinesRouter from './routes/rewardsFines';
 import userRoutes from './routes/user.routes';
+
 
 const app = express();
 
@@ -16,6 +18,7 @@ app.use(express.json());
 // Роуты должны идти после body-parser и CORS
 app.use('/api/users', userRoutes);
 app.use('/api/rewards-fines', rewardsFinesRouter);
+app.use('/api/attendance', attendanceRoutes);
 
 // Корневой маршрут для проверки работы API
 app.get('/', (req, res) => {
