@@ -1,11 +1,22 @@
-import { Grid, Paper, Typography, Box, Avatar, LinearProgress } from '@mui/material';
-import PeopleRoundedIcon from '@mui/icons-material/PeopleRounded';
-import FormatListBulletedRoundedIcon from '@mui/icons-material/FormatListBulletedRounded';
-import AccessTimeRoundedIcon from '@mui/icons-material/AccessTimeRounded';
-import PaidRoundedIcon from '@mui/icons-material/PaidRounded';
-import TrendingUpRoundedIcon from '@mui/icons-material/TrendingUpRounded';
-import TrendingDownRoundedIcon from '@mui/icons-material/TrendingDownRounded';
-import { keyframes } from '@mui/system';
+// frontend/src/pages/Dashboard.tsx
+// Проверь точный путь и название файла
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
+import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
+import PaidRoundedIcon from "@mui/icons-material/PaidRounded";
+import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
+import TrendingDownRoundedIcon from "@mui/icons-material/TrendingDownRounded";
+import TrendingUpRoundedIcon from "@mui/icons-material/TrendingUpRounded";
+import {
+  Avatar,
+  Box,
+  Grid,
+  LinearProgress,
+  Paper,
+  Typography,
+} from "@mui/material";
+import { keyframes } from "@mui/system";
+import React, { useEffect, useState } from "react";
+import { fetchDashboardData } from "../infrastructure/api/dashboardApi";
 
 const fadeInUp = keyframes`
   from {
@@ -20,47 +31,58 @@ const fadeInUp = keyframes`
 
 interface StatCardProps {
   title: string;
-  value: string;
+  value: string | number;
   icon: React.ReactNode;
-  trend?: {
-    value: number;
-    isPositive: boolean;
-  };
+  trend?: { value: number; isPositive: boolean };
   color: string;
   delay?: number;
 }
 
-const StatCard = ({ title, value, icon, trend, color, delay = 0 }: StatCardProps) => (
+const StatCard = ({
+  title,
+  value,
+  icon,
+  trend,
+  color,
+  delay = 0,
+}: StatCardProps) => (
   <Paper
     sx={{
       p: 3,
-      height: '100%',
-      display: 'flex',
-      flexDirection: 'column',
-      position: 'relative',
-      overflow: 'hidden',
+      height: "100%",
+      display: "flex",
+      flexDirection: "column",
+      position: "relative",
+      overflow: "hidden",
       animation: `${fadeInUp} 0.6s ease-out forwards`,
       animationDelay: `${delay}s`,
       opacity: 0,
-      '&::before': {
+      "&::before": {
         content: '""',
-        position: 'absolute',
+        position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         height: 4,
         bgcolor: color,
       },
-      transition: 'all 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'translateY(-4px)',
-        '& .icon-wrapper': {
-          transform: 'scale(1.1)',
+      transition: "all 0.3s ease-in-out",
+      "&:hover": {
+        transform: "translateY(-4px)",
+        "& .icon-wrapper": {
+          transform: "scale(1.1)",
         },
       },
     }}
   >
-    <Box sx={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', mb: 2 }}>
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        justifyContent: "space-between",
+        mb: 2,
+      }}
+    >
       <Avatar
         className="icon-wrapper"
         sx={{
@@ -68,7 +90,7 @@ const StatCard = ({ title, value, icon, trend, color, delay = 0 }: StatCardProps
           color: color,
           width: 48,
           height: 48,
-          transition: 'transform 0.3s ease-in-out',
+          transition: "transform 0.3s ease-in-out",
         }}
       >
         {icon}
@@ -76,30 +98,38 @@ const StatCard = ({ title, value, icon, trend, color, delay = 0 }: StatCardProps
       {trend && (
         <Box
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            color: trend.isPositive ? 'success.main' : 'error.main',
-            bgcolor: trend.isPositive ? 'success.lighter' : 'error.lighter',
+            display: "flex",
+            alignItems: "center",
+            color: trend.isPositive ? "success.main" : "error.main",
+            bgcolor: trend.isPositive ? "success.lighter" : "error.lighter",
             py: 0.5,
             px: 1,
             borderRadius: 1,
-            transition: 'transform 0.3s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.05)',
+            transition: "transform 0.3s ease-in-out",
+            "&:hover": {
+              transform: "scale(1.05)",
             },
           }}
         >
-          {trend.isPositive ? <TrendingUpRoundedIcon /> : <TrendingDownRoundedIcon />}
+          {trend.isPositive ? (
+            <TrendingUpRoundedIcon />
+          ) : (
+            <TrendingDownRoundedIcon />
+          )}
           <Typography variant="caption" sx={{ ml: 0.5, fontWeight: 500 }}>
             {trend.value}%
           </Typography>
         </Box>
       )}
     </Box>
-    <Typography variant="h4" sx={{ mb: 0.5, letterSpacing: '-0.025em' }}>
+    <Typography variant="h4" sx={{ mb: 0.5, letterSpacing: "-0.025em" }}>
       {value}
     </Typography>
-    <Typography variant="body2" color="text.secondary" sx={{ letterSpacing: '-0.011em' }}>
+    <Typography
+      variant="body2"
+      color="text.secondary"
+      sx={{ letterSpacing: "-0.011em" }}
+    >
       {title}
     </Typography>
   </Paper>
@@ -114,18 +144,25 @@ interface ActivityItemProps {
   delay?: number;
 }
 
-const ActivityItem = ({ avatar, name, action, time, color, delay = 0 }: ActivityItemProps) => (
+const ActivityItem = ({
+  avatar,
+  name,
+  action,
+  time,
+  color,
+  delay = 0,
+}: ActivityItemProps) => (
   <Box
     sx={{
-      display: 'flex',
-      alignItems: 'center',
+      display: "flex",
+      alignItems: "center",
       mb: 2,
       opacity: 0,
       animation: `${fadeInUp} 0.6s ease-out forwards`,
       animationDelay: `${delay}s`,
-      transition: 'all 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'translateX(4px)',
+      transition: "all 0.3s ease-in-out",
+      "&:hover": {
+        transform: "translateX(4px)",
       },
     }}
   >
@@ -133,23 +170,31 @@ const ActivityItem = ({ avatar, name, action, time, color, delay = 0 }: Activity
       sx={{
         bgcolor: `${color}15`,
         color: color,
-        transition: 'transform 0.3s ease-in-out',
-        '&:hover': {
-          transform: 'scale(1.1)',
+        transition: "transform 0.3s ease-in-out",
+        "&:hover": {
+          transform: "scale(1.1)",
         },
       }}
     >
       {avatar}
     </Avatar>
     <Box sx={{ ml: 2, flex: 1 }}>
-      <Typography variant="subtitle2" sx={{ letterSpacing: '-0.025em' }}>
+      <Typography variant="subtitle2" sx={{ letterSpacing: "-0.025em" }}>
         {name}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ letterSpacing: '-0.011em' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ letterSpacing: "-0.011em" }}
+      >
         {action}
       </Typography>
     </Box>
-    <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: '-0.011em' }}>
+    <Typography
+      variant="caption"
+      color="text.secondary"
+      sx={{ letterSpacing: "-0.011em" }}
+    >
       {time}
     </Typography>
   </Box>
@@ -163,24 +208,34 @@ interface TaskProgressProps {
   delay?: number;
 }
 
-const TaskProgress = ({ title, progress, total, color, delay = 0 }: TaskProgressProps) => (
+const TaskProgress = ({
+  title,
+  progress,
+  total,
+  color,
+  delay = 0,
+}: TaskProgressProps) => (
   <Box
     sx={{
       mb: 2,
       opacity: 0,
       animation: `${fadeInUp} 0.6s ease-out forwards`,
       animationDelay: `${delay}s`,
-      transition: 'all 0.3s ease-in-out',
-      '&:hover': {
-        transform: 'translateX(4px)',
+      transition: "all 0.3s ease-in-out",
+      "&:hover": {
+        transform: "translateX(4px)",
       },
     }}
   >
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-      <Typography variant="body2" sx={{ letterSpacing: '-0.011em' }}>
+    <Box sx={{ display: "flex", justifyContent: "space-between", mb: 1 }}>
+      <Typography variant="body2" sx={{ letterSpacing: "-0.011em" }}>
         {title}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ letterSpacing: '-0.011em' }}>
+      <Typography
+        variant="body2"
+        color="text.secondary"
+        sx={{ letterSpacing: "-0.011em" }}
+      >
         {progress}/{total}
       </Typography>
     </Box>
@@ -191,24 +246,58 @@ const TaskProgress = ({ title, progress, total, color, delay = 0 }: TaskProgress
         height: 6,
         borderRadius: 3,
         bgcolor: `${color}15`,
-        '& .MuiLinearProgress-bar': {
+        "& .MuiLinearProgress-bar": {
           bgcolor: color,
-          transition: 'transform 0.6s ease-in-out',
+          transition: "transform 0.6s ease-in-out",
         },
       }}
     />
   </Box>
 );
 
+interface DashboardData {
+  activeEmployees: number;
+  pendingTasks: number;
+  lateArrivals: number;
+  totalRewards: number;
+  recentActivities: ActivityItemProps[];
+  taskProgress: TaskProgressProps[];
+}
+
 export default function Dashboard() {
+  const [data, setData] = useState<DashboardData | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchDashboardData()
+      .then((res) => setData(res.data))
+      .catch(() => setError("Failed to load dashboard data"));
+  }, []);
+
+  if (error) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography color="error">{error}</Typography>
+      </Box>
+    );
+  }
+
+  if (!data) {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
   return (
-    <Box>
+    <Box sx={{ p: 3 }}>
       <Typography
         variant="h4"
         gutterBottom
         fontWeight="600"
         sx={{
-          letterSpacing: '-0.025em',
+          letterSpacing: "-0.025em",
           opacity: 0,
           animation: `${fadeInUp} 0.6s ease-out forwards`,
         }}
@@ -219,7 +308,7 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Active Employees"
-            value="24"
+            value={data.activeEmployees}
             icon={<PeopleRoundedIcon />}
             trend={{ value: 12, isPositive: true }}
             color="#0051FF"
@@ -229,7 +318,7 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Pending Tasks"
-            value="12"
+            value={data.pendingTasks}
             icon={<FormatListBulletedRoundedIcon />}
             trend={{ value: 5, isPositive: false }}
             color="#28CD41"
@@ -239,7 +328,7 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Late Arrivals Today"
-            value="3"
+            value={data.lateArrivals}
             icon={<AccessTimeRoundedIcon />}
             color="#FF3B30"
             delay={0.3}
@@ -248,7 +337,7 @@ export default function Dashboard() {
         <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Total Rewards"
-            value="$1.2K"
+            value={`$${data.totalRewards}`}
             icon={<PaidRoundedIcon />}
             trend={{ value: 8, isPositive: true }}
             color="#FF2D55"
@@ -260,47 +349,26 @@ export default function Dashboard() {
           <Paper
             sx={{
               p: 3,
-              height: '100%',
+              height: "100%",
               opacity: 0,
               animation: `${fadeInUp} 0.6s ease-out forwards`,
-              animationDelay: '0.5s',
+              animationDelay: "0.5s",
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ letterSpacing: '-0.025em' }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ letterSpacing: "-0.025em" }}
+            >
               Recent Activity
             </Typography>
-            <ActivityItem
-              avatar="J"
-              name="John Doe"
-              action="Completed the kitchen cleaning task"
-              time="2m ago"
-              color="#0051FF"
-              delay={0.6}
-            />
-            <ActivityItem
-              avatar="S"
-              name="Sarah Smith"
-              action="Marked attendance for morning shift"
-              time="15m ago"
-              color="#28CD41"
-              delay={0.7}
-            />
-            <ActivityItem
-              avatar="M"
-              name="Mike Johnson"
-              action="Received a reward for excellent service"
-              time="1h ago"
-              color="#FF2D55"
-              delay={0.8}
-            />
-            <ActivityItem
-              avatar="A"
-              name="Anna White"
-              action="Arrived 10 minutes late"
-              time="2h ago"
-              color="#FF3B30"
-              delay={0.9}
-            />
+            {data.recentActivities.map((activity, idx) => (
+              <ActivityItem
+                key={activity.id}
+                {...activity}
+                delay={0.6 + idx * 0.1}
+              />
+            ))}
           </Paper>
         </Grid>
 
@@ -308,46 +376,29 @@ export default function Dashboard() {
           <Paper
             sx={{
               p: 3,
-              height: '100%',
+              height: "100%",
               opacity: 0,
               animation: `${fadeInUp} 0.6s ease-out forwards`,
-              animationDelay: '0.5s',
+              animationDelay: "0.5s",
             }}
           >
-            <Typography variant="h6" gutterBottom sx={{ letterSpacing: '-0.025em' }}>
+            <Typography
+              variant="h6"
+              gutterBottom
+              sx={{ letterSpacing: "-0.025em" }}
+            >
               Task Progress
             </Typography>
-            <TaskProgress
-              title="Kitchen Tasks"
-              progress={8}
-              total={10}
-              color="#0051FF"
-              delay={0.6}
-            />
-            <TaskProgress
-              title="Service Tasks"
-              progress={5}
-              total={8}
-              color="#28CD41"
-              delay={0.7}
-            />
-            <TaskProgress
-              title="Maintenance Tasks"
-              progress={3}
-              total={5}
-              color="#FF2D55"
-              delay={0.8}
-            />
-            <TaskProgress
-              title="Training Tasks"
-              progress={2}
-              total={4}
-              color="#FF9500"
-              delay={0.9}
-            />
+            {data.taskProgress.map((progress, idx) => (
+              <TaskProgress
+                key={progress.title}
+                {...progress}
+                delay={0.6 + idx * 0.1}
+              />
+            ))}
           </Paper>
         </Grid>
       </Grid>
     </Box>
   );
-} 
+}

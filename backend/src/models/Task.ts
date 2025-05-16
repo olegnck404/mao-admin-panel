@@ -8,6 +8,7 @@ export interface ITask extends Document {
   status: 'Todo' | 'In Progress' | 'Done';
   isGlobal: boolean;
   assignees: string[]; // user IDs or names
+  completedBy: string[];
 }
 
 const TaskSchema = new Schema<ITask>({
@@ -18,6 +19,7 @@ const TaskSchema = new Schema<ITask>({
   status: { type: String, enum: ['Todo', 'In Progress', 'Done'], default: 'Todo' },
   isGlobal: { type: Boolean, default: false },
   assignees: { type: [String], default: [] },
+  completedBy: { type: [String], default: [] },
 });
 
 export default mongoose.model<ITask>('Task', TaskSchema);

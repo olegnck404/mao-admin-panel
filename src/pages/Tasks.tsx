@@ -1,11 +1,9 @@
 import AddIcon from "@mui/icons-material/Add";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import {
   Box,
   Button,
-  Card,
-  CardContent,
   Checkbox,
   Chip,
   Dialog,
@@ -13,10 +11,10 @@ import {
   DialogContent,
   DialogTitle,
   FormControl,
-  Grid,
   InputLabel,
   ListItemText,
   MenuItem,
+  OutlinedInput,
   Paper,
   Select,
   Table,
@@ -31,20 +29,22 @@ import {
   useTheme,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import { useEffect, useState } from "react";
 
 interface Task {
   _id: string;
   title: string;
-  assignee?: string;
-  dueDate: string;
+  isGlobal: boolean;
+  assignees: string[]; // для общих задач
+  assignee?: string; // для личных
+  dueDate: string; // ISO string
   priority: "High" | "Medium" | "Low";
   status: "Todo" | "In Progress" | "Done";
-  isCommon: boolean;
-  assigneesCommon?: string[];
+  completedBy: string[]; // кто выполнил
 }
 
 interface User {
@@ -60,132 +60,204 @@ export default function Tasks() {
   const [users, setUsers] = useState<User[]>([]);
   const [openDialog, setOpenDialog] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filterUser, setFilterUser] = useState<string | "">("");
-  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
+  const [filterUser, setFilterUser] = useState<string>("");
+  const [selectedTaskIds, setSelectedTaskIds] = useState<string[]>([]);
 
   const [newTask, setNewTask] = useState<Partial<Task>>({
     title: "",
+    isGlobal: false,
+    assignees: [],
+    assignee: "",
     dueDate: new Date().toISOString(),
     priority: "Medium",
     status: "Todo",
-    isCommon: false,
-    assigneesCommon: [],
+    completedBy: [],
   });
+
+  // Загрузка юзеров с бекенда
+  const fetchUsers = async () => {
+    try {
+      const res = await axios.get<User[]>("/api/users");
+      setUsers(res.data);
+    } catch (error) {
+      console.error("Failed to fetch users", error);
+    }
+  };
+
+  // Загрузка тасков с бекенда, с дефолтами для полей
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get<Task[]>("/api/task");
+      const tasksWithDefaults = res.data.map((task) => ({
+        ...task,
+        completedBy: task.completedBy || [],
+        assignees: task.assignees || [],
+      }));
+      setTasks(tasksWithDefaults);
+    } catch (error) {
+      console.error("Failed to fetch tasks", error);
+    }
+  };
 
   useEffect(() => {
     fetchUsers();
     fetchTasks();
   }, []);
 
-  const fetchUsers = async () => {
-    try {
-      const res = await axios.get<User[]>("/api/users");
-      setUsers(res.data);
-    } catch {
-      // handle error
-    }
-  };
-
-  const fetchTasks = async () => {
-    try {
-      const res = await axios.get<Task[]>("/api/task");
-      setTasks(res.data);
-    } catch {
-      // handle error
-    }
-  };
-
+  // Фильтрация тасков по ID и пользователю (ассигни)
   const filteredTasks = tasks.filter((task) => {
-    const matchesSearch = task.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase());
-    const matchesUser = filterUser
-      ? task.isCommon
-        ? task.assigneesCommon?.includes(filterUser)
-        : task.assignee === filterUser
-      : true;
+    const matchesSearch = task._id.includes(searchQuery);
+    const matchesUser =
+      !filterUser ||
+      (!task.isGlobal && task.assignee === filterUser) ||
+      (task.isGlobal && task.assignees.includes(filterUser));
     return matchesSearch && matchesUser;
   });
 
-  const handleSelectTask = (id: string) => {
-    setSelectedTasks((prev) =>
-      prev.includes(id) ? prev.filter((tid) => tid !== id) : [...prev, id]
-    );
-  };
-
-  const handleSelectAll = (checked: boolean) => {
-    if (checked) {
-      const allIds = filteredTasks
-        .filter((t) => t.isCommon)
-        .flatMap((t) => [t._id]);
-      setSelectedTasks(allIds);
-    } else {
-      setSelectedTasks([]);
-    }
-  };
-
-  const handleDeleteSelected = async () => {
-    try {
-      await Promise.all(
-        selectedTasks.map((id) => axios.delete(`/api/task/${id}`))
-      );
-      setSelectedTasks([]);
-      fetchTasks();
-    } catch {
-      // handle error
-    }
-  };
-
-  const handleMarkDoneSelected = async () => {
-    try {
-      await Promise.all(
-        selectedTasks.map((id) =>
-          axios.put(`/api/task/${id}`, { status: "Done" })
-        )
-      );
-      setSelectedTasks([]);
-      fetchTasks();
-    } catch {
-      // handle error
-    }
-  };
-
+  // Добавление новой задачи
   const handleAddTask = async () => {
+    if (
+      !newTask.title ||
+      (!newTask.assignee && !newTask.isGlobal) ||
+      (newTask.isGlobal &&
+        (!newTask.assignees || newTask.assignees.length === 0))
+    ) {
+      alert("Please fill all required fields");
+      return;
+    }
     try {
-      let taskToCreate = { ...newTask };
-      if (
-        taskToCreate.isCommon &&
-        (!taskToCreate.assigneesCommon ||
-          taskToCreate.assigneesCommon.length === 0)
-      ) {
-        alert("Please select at least one assignee for common task");
-        return;
-      }
-      if (!taskToCreate.isCommon && !taskToCreate.assignee) {
-        alert("Please select assignee for personal task");
-        return;
-      }
-      if (typeof taskToCreate.dueDate === "object") {
-        taskToCreate.dueDate = (taskToCreate.dueDate as Date).toISOString();
-      }
-      await axios.post("/api/task", taskToCreate);
+      const taskToSend = {
+        ...newTask,
+        dueDate:
+          typeof newTask.dueDate === "string"
+            ? newTask.dueDate
+            : newTask.dueDate?.toISOString(),
+        assignees: newTask.isGlobal ? newTask.assignees : [],
+        isGlobal: newTask.isGlobal,
+      };
+      await axios.post("/api/task", taskToSend);
       setOpenDialog(false);
       setNewTask({
         title: "",
+        isGlobal: false,
+        assignees: [],
+        assignee: "",
         dueDate: new Date().toISOString(),
         priority: "Medium",
         status: "Todo",
-        isCommon: false,
-        assigneesCommon: [],
+        completedBy: [],
       });
       fetchTasks();
-    } catch {
-      // handle error
+    } catch (error) {
+      console.error("Failed to add task", error);
+    }
+  };
+
+  // Удаление выбранных задач
+  const handleDeleteTasks = async (ids: string[]) => {
+    try {
+      await Promise.all(ids.map((id) => axios.delete(`/api/task/${id}`)));
+      setSelectedTaskIds([]);
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to delete tasks", error);
+    }
+  };
+
+  // Тоггл статуса персональной задачи (выполнено/не выполнено)
+  const togglePersonalComplete = async (task: Task) => {
+    try {
+      const isCompleted = task.completedBy.includes(task.assignee || "");
+      const updatedCompletedBy = isCompleted ? [] : [task.assignee || ""];
+      const updatedStatus = isCompleted ? "Todo" : "Done";
+
+      await axios.put(`/api/task/${task._id}`, {
+        completedBy: updatedCompletedBy,
+        status: updatedStatus,
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to update task", error);
+    }
+  };
+
+  // Тоггл статуса конкретного работника в общей задаче
+  const toggleCommonComplete = async (task: Task, user: string) => {
+    try {
+      let updatedCompletedBy = task.completedBy.includes(user)
+        ? task.completedBy.filter((u) => u !== user)
+        : [...task.completedBy, user];
+      let updatedStatus =
+        updatedCompletedBy.length === task.assignees.length
+          ? "Done"
+          : "In Progress";
+
+      await axios.put(`/api/task/${task._id}`, {
+        completedBy: updatedCompletedBy,
+        status: updatedStatus,
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to update task", error);
+    }
+  };
+
+  // Отметить все/снять отметку со всех работников общей задачи
+  const toggleCompleteAll = async (task: Task) => {
+    try {
+      const allCompleted = task.completedBy.length === task.assignees.length;
+      const updatedCompletedBy = allCompleted ? [] : [...task.assignees];
+      const updatedStatus = allCompleted ? "Todo" : "Done";
+
+      await axios.put(`/api/task/${task._id}`, {
+        completedBy: updatedCompletedBy,
+        status: updatedStatus,
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error("Failed to update task", error);
+    }
+  };
+
+  // Выделение задач для удаления
+  const toggleSelectTask = (taskId: string) => {
+    setSelectedTaskIds((prev) =>
+      prev.includes(taskId)
+        ? prev.filter((id) => id !== taskId)
+        : [...prev, taskId]
+    );
+  };
+
+  // Цвета для приоритета и статуса
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "High":
+        return theme.palette.error.main;
+      case "Medium":
+        return theme.palette.warning.main;
+      case "Low":
+        return theme.palette.success.main;
+      default:
+        return theme.palette.primary.main;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Todo":
+        return theme.palette.info.main;
+      case "In Progress":
+        return theme.palette.warning.main;
+      case "Done":
+        return theme.palette.success.main;
+      default:
+        return theme.palette.primary.main;
     }
   };
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+      {/* Фильтры и поиск */}
       <Box
         sx={{
           mb: 3,
@@ -197,7 +269,7 @@ export default function Tasks() {
       >
         <TextField
           sx={{ flex: 1 }}
-          placeholder="Search tasks..."
+          placeholder="Search by Task ID..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           InputProps={{
@@ -206,12 +278,11 @@ export default function Tasks() {
             ),
           }}
         />
-
         <FormControl sx={{ minWidth: 180 }}>
-          <InputLabel>User Filter</InputLabel>
+          <InputLabel>Filter by User</InputLabel>
           <Select
             value={filterUser}
-            label="User Filter"
+            label="Filter by User"
             onChange={(e) => setFilterUser(e.target.value)}
           >
             <MenuItem value="">All</MenuItem>
@@ -222,144 +293,94 @@ export default function Tasks() {
             ))}
           </Select>
         </FormControl>
-
         <Button
           variant="contained"
-          color="primary"
-          startIcon={<FilterListIcon />}
-          onClick={() => {
-            setSearchQuery("");
-            setFilterUser("");
-            setSelectedTasks([]);
-            fetchTasks();
-          }}
-          sx={{ minWidth: 120 }}
+          color="error"
+          startIcon={<DeleteIcon />}
+          disabled={selectedTaskIds.length === 0}
+          onClick={() => handleDeleteTasks(selectedTaskIds)}
+          sx={{ minWidth: 130 }}
         >
-          Reset Filters
+          Delete Selected
         </Button>
-
         <Button
           variant="contained"
           color="primary"
           startIcon={<AddIcon />}
           onClick={() => setOpenDialog(true)}
-          sx={{ minWidth: 120 }}
+          sx={{ minWidth: 130 }}
         >
           Add Task
         </Button>
       </Box>
 
-      <Box sx={{ mb: 2 }}>
-        {selectedTasks.length > 0 && (
-          <>
-            <Button color="error" onClick={handleDeleteSelected} sx={{ mr: 1 }}>
-              Delete Selected
-            </Button>
-            <Button color="success" onClick={handleMarkDoneSelected}>
-              Mark Done Selected
-            </Button>
-          </>
-        )}
-      </Box>
+      {/* Таблица задач */}
+      <TableContainer component={Paper} sx={{ flex: 1 }}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell padding="checkbox" />
+              <TableCell>Title</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Assignee(s)</TableCell>
+              <TableCell>Due Date</TableCell>
+              <TableCell>Priority</TableCell>
+              <TableCell>Status</TableCell>
+              <TableCell>Completion</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredTasks.map((task) => {
+              const isSelected = selectedTaskIds.includes(task._id);
+              const completedBy = task.completedBy || [];
+              const assignees = task.assignees || [];
 
-      {isMobile ? (
-        <Grid container spacing={2}>
-          {filteredTasks.map((task) => (
-            <Grid item xs={12} key={task._id}>
-              <Card>
-                <CardContent>
-                  <Box sx={{ display: "flex", alignItems: "center", mb: 1 }}>
-                    {task.isCommon && (
-                      <Checkbox
-                        checked={selectedTasks.includes(task._id)}
-                        onChange={() => handleSelectTask(task._id)}
-                      />
-                    )}
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={600}
-                      sx={{ ml: task.isCommon ? 1 : 0 }}
-                    >
-                      {task.title}
-                    </Typography>
-                  </Box>
-                  <Typography variant="body2" color="text.secondary">
-                    Assignee:{" "}
-                    {task.isCommon
-                      ? `Common (${task.assigneesCommon?.length || 0} users)`
-                      : task.assignee}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    Due: {new Date(task.dueDate).toLocaleDateString()}
-                  </Typography>
-                  <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
-                    <Chip
-                      label={task.priority}
-                      size="small"
-                      sx={{
-                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                        color: theme.palette.error.main,
-                        fontWeight: 600,
-                      }}
-                    />
-                    <Chip
-                      label={task.status}
-                      size="small"
-                      sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
-                        color: theme.palette.success.main,
-                        fontWeight: 600,
-                      }}
-                    />
-                  </Box>
-                </CardContent>
-              </Card>
-            </Grid>
-          ))}
-        </Grid>
-      ) : (
-        <TableContainer component={Paper} sx={{ flex: 1 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    indeterminate={
-                      selectedTasks.length > 0 &&
-                      selectedTasks.length <
-                        filteredTasks.filter((t) => t.isCommon).length
-                    }
-                    checked={
-                      filteredTasks.length > 0 &&
-                      selectedTasks.length ===
-                        filteredTasks.filter((t) => t.isCommon).length
-                    }
-                    onChange={(e) => handleSelectAll(e.target.checked)}
-                  />
-                </TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Assignee</TableCell>
-                <TableCell>Due Date</TableCell>
-                <TableCell>Priority</TableCell>
-                <TableCell>Status</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredTasks.map((task) => (
-                <TableRow key={task._id} hover>
+              return (
+                <TableRow key={task._id} hover selected={isSelected}>
                   <TableCell padding="checkbox">
-                    {task.isCommon ? (
-                      <Checkbox
-                        checked={selectedTasks.includes(task._id)}
-                        onChange={() => handleSelectTask(task._id)}
-                      />
-                    ) : null}
+                    <Checkbox
+                      checked={isSelected}
+                      onChange={() => toggleSelectTask(task._id)}
+                    />
                   </TableCell>
                   <TableCell>{task.title}</TableCell>
+                  <TableCell>{task.isGlobal ? "Common" : "Personal"}</TableCell>
                   <TableCell>
-                    {task.isCommon
-                      ? `Common (${task.assigneesCommon?.length || 0} users)`
-                      : task.assignee}
+                    {task.isGlobal ? (
+                      <Box>
+                        <Button
+                          onClick={() => toggleCompleteAll(task)}
+                          size="small"
+                          variant="outlined"
+                          sx={{ mb: 1 }}
+                        >
+                          {completedBy.length === assignees.length
+                            ? "Unmark All"
+                            : "Mark All Done"}
+                        </Button>
+                        <Box>
+                          {assignees.map((user) => (
+                            <Box
+                              key={user}
+                              sx={{ display: "flex", alignItems: "center" }}
+                            >
+                              <Checkbox
+                                checked={completedBy.includes(user)}
+                                onChange={() =>
+                                  toggleCommonComplete(task, user)
+                                }
+                              />
+                              <Typography>{user}</Typography>
+                            </Box>
+                          ))}
+                        </Box>
+                      </Box>
+                    ) : (
+                      <Checkbox
+                        checked={completedBy.includes(task.assignee || "")}
+                        onChange={() => togglePersonalComplete(task)}
+                      />
+                    )}
                   </TableCell>
                   <TableCell>
                     {new Date(task.dueDate).toLocaleDateString()}
@@ -369,8 +390,8 @@ export default function Tasks() {
                       label={task.priority}
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.error.main, 0.1),
-                        color: theme.palette.error.main,
+                        bgcolor: alpha(getPriorityColor(task.priority), 0.1),
+                        color: getPriorityColor(task.priority),
                         fontWeight: 600,
                       }}
                     />
@@ -380,19 +401,31 @@ export default function Tasks() {
                       label={task.status}
                       size="small"
                       sx={{
-                        bgcolor: alpha(theme.palette.success.main, 0.1),
-                        color: theme.palette.success.main,
+                        bgcolor: alpha(getStatusColor(task.status), 0.1),
+                        color: getStatusColor(task.status),
                         fontWeight: 600,
                       }}
                     />
                   </TableCell>
+                  <TableCell>
+                    {task.isGlobal ? (
+                      <Typography>
+                        {completedBy.length}/{assignees.length} done
+                      </Typography>
+                    ) : (
+                      <Typography>
+                        {completedBy.length === 1 ? "Done" : "Not done"}
+                      </Typography>
+                    )}
+                  </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+              );
+            })}
+          </TableBody>
+        </Table>
+      </TableContainer>
 
+      {/* Диалог добавления задачи */}
       <Dialog
         open={openDialog}
         onClose={() => setOpenDialog(false)}
@@ -405,27 +438,55 @@ export default function Tasks() {
             <TextField
               label="Title"
               fullWidth
-              value={newTask.title || ""}
+              value={newTask.title}
               onChange={(e) =>
                 setNewTask({ ...newTask, title: e.target.value })
               }
             />
-
             <FormControl fullWidth>
-              <InputLabel>Is Common Task?</InputLabel>
+              <InputLabel>Type</InputLabel>
               <Select
-                value={newTask.isCommon ? "yes" : "no"}
-                label="Is Common Task?"
+                value={newTask.isGlobal ? "common" : "personal"}
+                label="Type"
                 onChange={(e) =>
-                  setNewTask({ ...newTask, isCommon: e.target.value === "yes" })
+                  setNewTask({
+                    ...newTask,
+                    isGlobal: e.target.value === "common",
+                    assignee: "",
+                    assignees: [],
+                  })
                 }
               >
-                <MenuItem value="no">No (Personal Task)</MenuItem>
-                <MenuItem value="yes">Yes (Common Task)</MenuItem>
+                <MenuItem value="personal">Personal</MenuItem>
+                <MenuItem value="common">Common</MenuItem>
               </Select>
             </FormControl>
-
-            {!newTask.isCommon ? (
+            {newTask.isGlobal ? (
+              <FormControl fullWidth>
+                <InputLabel>Assignees</InputLabel>
+                <Select
+                  multiple
+                  value={newTask.assignees || []}
+                  onChange={(e) =>
+                    setNewTask({
+                      ...newTask,
+                      assignees: e.target.value as string[],
+                    })
+                  }
+                  input={<OutlinedInput label="Assignees" />}
+                  renderValue={(selected) => (selected as string[]).join(", ")}
+                >
+                  {users.map((user) => (
+                    <MenuItem key={user._id} value={user.name}>
+                      <Checkbox
+                        checked={newTask.assignees?.includes(user.name)}
+                      />
+                      <ListItemText primary={user.name} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
               <FormControl fullWidth>
                 <InputLabel>Assignee</InputLabel>
                 <Select
@@ -442,47 +503,22 @@ export default function Tasks() {
                   ))}
                 </Select>
               </FormControl>
-            ) : (
-              <FormControl fullWidth>
-                <InputLabel>Assignees (Common Task)</InputLabel>
-                <Select
-                  multiple
-                  value={newTask.assigneesCommon || []}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setNewTask({
-                      ...newTask,
-                      assigneesCommon:
-                        typeof value === "string" ? value.split(",") : value,
-                    });
-                  }}
-                  renderValue={(selected) => (selected as string[]).join(", ")}
-                >
-                  {users.map((user) => (
-                    <MenuItem key={user._id} value={user.name}>
-                      <Checkbox
-                        checked={
-                          newTask.assigneesCommon?.includes(user.name) || false
-                        }
-                      />
-                      <ListItemText primary={user.name} />
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
             )}
-
             <LocalizationProvider dateAdapter={AdapterDateFns}>
               <DatePicker
                 label="Due Date"
                 value={newTask.dueDate ? new Date(newTask.dueDate) : null}
                 onChange={(date) =>
-                  setNewTask({ ...newTask, dueDate: date?.toISOString() || "" })
+                  setNewTask({
+                    ...newTask,
+                    dueDate: date
+                      ? date.toISOString()
+                      : new Date().toISOString(),
+                  })
                 }
                 slotProps={{ textField: { fullWidth: true, margin: "dense" } }}
               />
             </LocalizationProvider>
-
             <FormControl fullWidth>
               <InputLabel>Priority</InputLabel>
               <Select
@@ -500,7 +536,6 @@ export default function Tasks() {
                 <MenuItem value="Low">Low</MenuItem>
               </Select>
             </FormControl>
-
             <FormControl fullWidth>
               <InputLabel>Status</InputLabel>
               <Select

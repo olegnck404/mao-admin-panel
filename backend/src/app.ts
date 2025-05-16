@@ -3,6 +3,7 @@ import express from 'express';
 import { connectDB } from './config/db'; // импорт подключения к БД
 import errorHandler from './middlewares/errorHandler';
 import attendanceRoutes from './routes/attendance.routes';
+import dashboardRoutes from './routes/dashboard.routes';
 import rewardsFinesRouter from './routes/rewardsFines';
 import taskRouter from './routes/task.routes';
 import userRoutes from './routes/user.routes';
@@ -11,6 +12,7 @@ const app = express();
 
 // Подключаем CORS с нужными опциями
 app.use(cors({ origin: 'http://localhost:3000', credentials: true }));
+app.use('/api/dashboard', dashboardRoutes);
 
 // Разбираем JSON тело запросов
 app.use(express.json());

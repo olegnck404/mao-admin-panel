@@ -1,18 +1,17 @@
 import mongoose from 'mongoose';
 
-const mongoUri = process.env.MONGO_URI || 'mongodb://localhost:27017/yourdb';
+const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/your-db-name';
 
-export const connectDB = async (): Promise<void> => {
+export const connectDB = async () => {
   if (mongoose.connection.readyState === 1) {
-    console.log('MongoDB is already connected');
+    // Уже подключены
     return;
   }
-
   try {
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(MONGO_URI);
     console.log('MongoDB connected');
   } catch (error) {
     console.error('MongoDB connection error:', error);
-    process.exit(1);
+    throw error;
   }
 };
