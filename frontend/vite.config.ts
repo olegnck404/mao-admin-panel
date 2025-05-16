@@ -34,12 +34,12 @@ export default defineConfig({
   },
   resolve: {
     alias: [
-      { find: '@', replacement: path.resolve(process.cwd(), 'src') },
-      { find: '@components', replacement: path.resolve(process.cwd(), 'src/components') },
-      { find: '@pages', replacement: path.resolve(process.cwd(), 'src/pages') },
-      { find: '@contexts', replacement: path.resolve(process.cwd(), 'src/contexts') },
-      { find: '@theme', replacement: path.resolve(process.cwd(), 'src/theme') },
-      { find: '@layouts', replacement: path.resolve(process.cwd(), 'src/layouts') }
+      { find: '@', replacement: path.resolve(__dirname, 'src') },
+      { find: '@components', replacement: path.resolve(__dirname, 'src/components') },
+      { find: '@pages', replacement: path.resolve(__dirname, 'src/pages') },
+      { find: '@contexts', replacement: path.resolve(__dirname, 'src/contexts') },
+      { find: '@theme', replacement: path.resolve(__dirname, 'src/theme') },
+      { find: '@layouts', replacement: path.resolve(__dirname, 'src/layouts') }
     ]
   },
   build: {
