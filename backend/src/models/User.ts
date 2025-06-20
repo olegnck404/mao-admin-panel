@@ -3,6 +3,8 @@ import mongoose, { Document } from 'mongoose';
 export interface IUser extends Document {
   name: string;
   email: string;
+  role: string;
+  password: string;
 }
 
 const UserSchema = new mongoose.Schema({
