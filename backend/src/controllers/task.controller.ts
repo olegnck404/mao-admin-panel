@@ -1,9 +1,31 @@
 import { Request, Response } from 'express';
-import Task from '../models/Task';
+import Task, { ITask } from '../models/Task';
+import User from '../models/User';
 
-export const getTasks = async (req: Request, res: Response): Promise<void> => {
+export const getTasks = async (req: Request & { userId?: string }, res: Response): Promise<void> => {
   try {
-    const tasks = await Task.find();
+    let tasks: ITask[] = [];
+    // Для админа и менеджера всегда возвращаем все задачи
+    if (req.userId) {
+      const user = await User.findById(req.userId);
+      if (user && (user.role === 'admin' || user.role === 'manager')) {
+        tasks = await Task.find();
+      } else if (user && user.role === 'user') {
+        // Для сотрудника — только свои и общие
+        tasks = await Task.find({
+          $or: [
+            { assignees: { $in: [user.name] } },
+            { isGlobal: true }
+          ]
+        });
+      } else {
+        // Если не найден пользователь — ничего
+        tasks = [];
+      }
+    } else {
+      // Неавторизованный: ничего
+      tasks = [];
+    }
     res.json(tasks);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch tasks', error });

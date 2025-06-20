@@ -59,8 +59,19 @@ function requireUser(req: Request & { userId?: string }, res: Response, next: Ne
   next();
 }
 
+// Middleware для проверки роли пользователя
+function requireRole(...roles: string[]) {
+  return async (req: Request & { userId?: string }, res: Response, next: NextFunction) => {
+    const user = await User.findById(req.userId) as any;
+    if (!user || !roles.includes(user.role)) {
+      return res.status(403).json({ message: "Forbidden: insufficient role" });
+    }
+    next();
+  };
+}
+
 // Endpoint для получения своих данных (основная информация)
-app.get("/api/user/me", requireUser, async (req: Request & { userId?: string }, res: Response) => {
+app.get("/api/user/me", requireUser, requireRole("admin", "manager", "user"), async (req: Request & { userId?: string }, res: Response) => {
   try {
     const user = await User.findById(req.userId) as any;
     if (!user) {
@@ -79,7 +90,7 @@ app.get("/api/user/me", requireUser, async (req: Request & { userId?: string }, 
 });
 
 // Endpoint для получения своих задач
-app.get("/api/user/me/tasks", requireUser, async (req: Request & { userId?: string }, res: Response) => {
+app.get("/api/user/me/tasks", requireUser, requireRole("admin", "manager", "user"), async (req: Request & { userId?: string }, res: Response) => {
   try {
     const tasks = await Task.find({ assignees: { $in: [req.userId] } });
     res.json(tasks);
@@ -89,7 +100,7 @@ app.get("/api/user/me/tasks", requireUser, async (req: Request & { userId?: stri
 });
 
 // Endpoint для получения своих посещений/опозданий
-app.get("/api/user/me/attendance", requireUser, async (req: Request & { userId?: string }, res: Response) => {
+app.get("/api/user/me/attendance", requireUser, requireRole("admin", "manager", "user"), async (req: Request & { userId?: string }, res: Response) => {
   try {
     // attendance.employeeName должен совпадать с user.name
     const user = await User.findById(req.userId) as any;
@@ -105,7 +116,7 @@ app.get("/api/user/me/attendance", requireUser, async (req: Request & { userId?:
 });
 
 // Endpoint для получения своих премий/штрафов
-app.get("/api/user/me/rewards", requireUser, async (req: Request & { userId?: string }, res: Response) => {
+app.get("/api/user/me/rewards", requireUser, requireRole("admin", "manager", "user"), async (req: Request & { userId?: string }, res: Response) => {
   try {
     const user = await User.findById(req.userId) as any;
     if (!user) {
@@ -120,7 +131,7 @@ app.get("/api/user/me/rewards", requireUser, async (req: Request & { userId?: st
 });
 
 // Endpoint для получения своей статистики
-app.get("/api/user/me/stats", requireUser, async (req: Request & { userId?: string }, res: Response) => {
+app.get("/api/user/me/stats", requireUser, requireRole("admin", "manager", "user"), async (req: Request & { userId?: string }, res: Response) => {
   try {
     const user = await User.findById(req.userId) as any;
     if (!user) {
@@ -176,6 +187,17 @@ app.use("/api/users", userRoutes);
 app.use("/api/rewards-fines", rewardsFinesRouter);
 app.use("/api/attendance", attendanceRoutes);
 app.use("/api/task", taskRouter);
+
+// Пример защищённых роутов:
+app.get("/api/admin/secret", requireUser, requireRole("admin"), (req, res) => {
+  res.json({ message: "Только для админа" });
+});
+app.get("/api/manager/secret", requireUser, requireRole("admin", "manager"), (req, res) => {
+  res.json({ message: "Для менеджера и админа" });
+});
+app.get("/api/user/secret", requireUser, requireRole("admin", "manager", "user"), (req, res) => {
+  res.json({ message: "Для любого авторизованного пользователя" });
+});
 
 // Корневой маршрут для проверки работы API
 app.get("/", (req, res) => {
