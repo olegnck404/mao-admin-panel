@@ -1,5 +1,6 @@
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import {
   Avatar,
   Box,
@@ -13,6 +14,8 @@ import {
   TableHead,
   TableRow,
   Typography,
+  Button,
+  Stack,
 } from "@mui/material";
 import axios from "axios";
 import { useSnackbar } from "notistack";
@@ -94,11 +97,41 @@ export default function UsersList() {
     }
   };
 
+  // Очистка БД
+  const handleClearDatabase = async () => {
+    if (
+      !window.confirm(
+        "Are you sure you want to completely clear the database? This action cannot be undone.",
+      )
+    )
+      return;
+    try {
+      await axios.post("/api/maintenance/clear-db");
+      enqueueSnackbar("Database cleared", { variant: "success" });
+      fetchUsersStats();
+    } catch {
+      enqueueSnackbar("Failed to clear database", { variant: "error" });
+    }
+  };
+
   return (
     <Box>
-      <Typography variant="h4" mb={3}>
-        Users List & Stats
-      </Typography>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={3}
+      >
+        <Typography variant="h4">Users List & Stats</Typography>
+        <Button
+          variant="outlined"
+          color="error"
+          startIcon={<CleaningServicesIcon />}
+          onClick={handleClearDatabase}
+        >
+          Очистить БД
+        </Button>
+      </Stack>
 
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
