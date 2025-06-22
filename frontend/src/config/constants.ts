@@ -18,3 +18,5 @@ export const ERROR_MESSAGES = {
   VALIDATION_ERROR: 'Data validation error.',
   UNKNOWN_ERROR: 'An unknown error occurred.'
 } as const;
+
+export const DEFAULT_PAGE_SIZE = 10;

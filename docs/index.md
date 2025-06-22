@@ -1,4 +1,4 @@
-# MAO Admin Panel: Project Documentation
+n# MAO Admin Panel: Project Documentation
 
 Welcome to the official documentation for the MAO Admin Panel. This project is a qualifying work for the confirmation of the degree of a professional junior bachelor.
 

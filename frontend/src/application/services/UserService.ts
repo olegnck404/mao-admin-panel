@@ -101,13 +101,16 @@ export class UserService extends BaseService<User, string, UserFilters> {
     public async deactivateUser(id: string): Promise<Result<void>> {
         try {
             const userResult = await this.findById(id);
-            if (!userResult.isSuccess) {
-                return userResult;
+            if (userResult.isFailure()) {
+                return Result.fail(userResult.getError());
             }
 
             const user = userResult.getValue();
             user.deactivate();
-            await this.update(user);
+            const updateResult = await this.update(user);
+            if (updateResult.isFailure()) {
+                return Result.fail(updateResult.getError());
+            }
             return Result.ok();
         } catch (error) {
             return Result.fail(
