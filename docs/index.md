@@ -6,9 +6,9 @@ This site contains all the necessary documentation to understand, run, and contr
 
 ## Table of Contents
 
-- [[Introduction|Introduction]]
-- [[Getting Started|Getting Started]]
-- [[Architecture|System Architecture]]
-- [[Backend|Backend Guide]]
-- [[Frontend|Frontend Guide]]
-- [[Deployment|Deployment]]
+- [Introduction](Introduction.md)
+- [Getting Started](Getting Started.md)
+- [System Architecture](Architecture.md)
+- [Backend Guide](Backend.md)
+- [Frontend Guide](Frontend.md)
+- [Deployment](Deployment.md)
