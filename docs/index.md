@@ -8,7 +8,7 @@ This site contains all the necessary documentation to understand, run, and contr
 
 - [Introduction](Introduction.md)
 - [Getting Started](Getting Started.md)
-- [System Architecture](Architecture.md)
+- [System Architecture](ARCHITECTURE.md)
 - [Backend Guide](Backend.md)
 - [Frontend Guide](Frontend.md)
 - [Deployment](Deployment.md)
