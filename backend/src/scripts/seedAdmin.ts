@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import User from "../models/User";
 
-// Настройки подключения к БД (можно вынести в .env)
+// DB connection settings (can be moved to .env)
 const MONGO_URI =
   process.env.MONGO_URI || "mongodb://localhost:27017/mao-admin-panel";
 
@@ -15,7 +15,7 @@ async function seedAdmin() {
     const name = "Admin";
     const role = "admin";
 
-    // Проверяем, есть ли уже такой админ
+    // Check if an admin with this email already exists
     const existing = await User.findOne({ email });
     if (existing) {
       console.log("Admin user already exists:", email);

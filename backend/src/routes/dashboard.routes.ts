@@ -1,15 +1,14 @@
 // backend/src/routes/dashboard.routes.ts
 import express from "express";
-import { getStats, getTaskProgress } from "../controllers/dashboard.controller";
-import User from "../models/User";
 import Attendance from "../models/Attendance";
 import RewardFine from "../models/RewardFine";
+import User from "../models/User";
 
 const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {
-    // Получаем статистику
+    // Get statistics
     const statsPromise = getStatsData();
     const taskProgressPromise = getTaskProgressData();
     const recentActivitiesPromise = getRecentActivities();
@@ -33,13 +32,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Получение статистики (аналог getStats контроллера)
+// Get statistics (analogous to getStats controller)
 async function getStatsData() {
   const totalEmployees = await User.countDocuments();
   const pendingTasks = await (
     await import("../models/Task")
   ).default.countDocuments({ status: { $ne: "Done" } });
-  // Реальная логика для lateArrivals и totalRewards (примерно)
+  // Real logic for lateArrivals and totalRewards (approximate)
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const lateArrivals = await Attendance.countDocuments({
@@ -58,7 +57,7 @@ async function getStatsData() {
   };
 }
 
-// Получение прогресса задач (аналог getTaskProgress контроллера)
+// Get task progress (analogous to getTaskProgress controller)
 async function getTaskProgressData() {
   const Task = (await import("../models/Task")).default;
   const highPriorityTasks = await Task.countDocuments({ priority: "High" });
@@ -100,11 +99,11 @@ async function getTaskProgressData() {
   ];
 }
 
-// Получение последних активностей (пример: последние посещения и награды/штрафы)
+// Get recent activities (example: last visits and rewards/fines)
 async function getRecentActivities() {
-  // Последние 5 посещений
+  // Last 5 visits
   const attendance = await Attendance.find().sort({ date: -1 }).limit(3);
-  // Последние 2 награды/штрафа
+  // Last 2 rewards/fines
   const rewards = await RewardFine.find().sort({ date: -1 }).limit(2);
 
   const attendanceActivities = attendance.map((a, idx) => ({
@@ -128,7 +127,7 @@ async function getRecentActivities() {
   return [...attendanceActivities, ...rewardActivities];
 }
 
-// Endpoint для полной очистки БД (использовать только в dev/admin!)
+// Endpoint for full DB cleanup (use only in dev/admin!)
 router.delete("/purge-all", async (req, res) => {
   try {
     const User = (await import("../models/User")).default;

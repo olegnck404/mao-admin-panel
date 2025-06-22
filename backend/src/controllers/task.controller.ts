@@ -5,13 +5,13 @@ import User from '../models/User';
 export const getTasks = async (req: Request & { userId?: string }, res: Response): Promise<void> => {
   try {
     let tasks: ITask[] = [];
-    // Для админа и менеджера всегда возвращаем все задачи
+    // For admin and manager, always return all tasks
     if (req.userId) {
       const user = await User.findById(req.userId);
       if (user && (user.role === 'admin' || user.role === 'manager')) {
         tasks = await Task.find();
       } else if (user && user.role === 'user') {
-        // Для сотрудника — только свои и общие
+        // For employee - only their own and common tasks
         tasks = await Task.find({
           $or: [
             { assignees: { $in: [user.name] } },
@@ -19,11 +19,11 @@ export const getTasks = async (req: Request & { userId?: string }, res: Response
           ]
         });
       } else {
-        // Если не найден пользователь — ничего
+        // If user not found - return nothing
         tasks = [];
       }
     } else {
-      // Неавторизованный: ничего
+      // Unauthorized: return nothing
       tasks = [];
     }
     res.json(tasks);

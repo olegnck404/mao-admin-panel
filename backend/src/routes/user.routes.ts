@@ -11,7 +11,7 @@ import User from '../models/User';
 
 const router = express.Router();
 
-router.get('/stats', getUsersStats); // <- Добавляем этот роут ПЕРЕД роутом с :id
+router.get('/stats', getUsersStats); // <- Add this route BEFORE the route with :id
 
 router.get('/', async (req, res) => {
   try {

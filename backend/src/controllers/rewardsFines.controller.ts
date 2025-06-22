@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import RewardFine from '../models/RewardFine'; // mongoose модель
+import RewardFine from '../models/RewardFine'; // Mongoose model
 
 export const getRecords = async (req: Request, res: Response) => {
   try {

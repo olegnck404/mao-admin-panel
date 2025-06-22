@@ -1,38 +1,38 @@
 import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography,
-  useTheme,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Tooltip,
+    Typography,
+    useTheme,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface AttendanceRecord {
   id: number;
@@ -51,6 +51,7 @@ interface User {
 
 export default function Attendance() {
   const theme = useTheme();
+  const { user } = useAuth();
 
   const [records, setRecords] = useState<AttendanceRecord[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -76,9 +77,9 @@ export default function Attendance() {
     fetchUsers();
   }, []);
 
-  // Для примера — пока локальные записи (в будущем заменить на загрузку с сервера)
+  // For example — local records for now (in the future, replace with loading from the server)
   useEffect(() => {
-    // Можно загрузить сохранённые записи посещаемости с API, если есть
+    // You can load saved attendance records from the API, if available
   }, []);
 
   const handleOpen = () => setOpen(true);
@@ -154,9 +155,16 @@ export default function Attendance() {
   const getStatusBgColor = (status: AttendanceRecord["status"]) =>
     alpha(getStatusColor(status), 0.1);
 
-  const filteredRecords = records.filter((record) =>
-    record.employeeName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Filtering records: an employee sees only their own
+  const filteredRecords = records.filter((record) => {
+    if (!user) return false;
+    if (user.role === "user") {
+      return record.employeeName === user.name;
+    }
+    return record.employeeName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
+  });
 
   return (
     <Box>
@@ -187,18 +195,27 @@ export default function Attendance() {
               "& .MuiOutlinedInput-root": { bgcolor: "background.paper" },
             }}
           />
-          <Tooltip title="Filter">
-            <IconButton sx={{ bgcolor: "background.paper" }}>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpen}
-          >
-            Add Record
-          </Button>
+          {/* Only an employee can add a record for themselves */}
+          {user?.role === "user" ? (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => {
+                setOpen(true);
+                setNewRecord({ ...newRecord, employeeName: user.name });
+              }}
+            >
+              Add My Record
+            </Button>
+          ) : (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleOpen}
+            >
+              Add Record
+            </Button>
+          )}
         </Box>
       </Box>
 
@@ -214,7 +231,7 @@ export default function Attendance() {
                 <TableCell>Status</TableCell>
                 <TableCell>Late (minutes)</TableCell>
                 <TableCell align="center">Actions</TableCell>{" "}
-                {/* Колонка для кнопок */}
+                {/* Column for buttons */}
               </TableRow>
             </TableHead>
             <TableBody>
@@ -267,6 +284,7 @@ export default function Attendance() {
         </TableContainer>
       </Paper>
 
+      {/* Dialog for adding a record: an employee can only choose themselves */}
       <Dialog
         open={open}
         onClose={handleClose}
@@ -288,12 +306,17 @@ export default function Attendance() {
               onChange={(e) =>
                 setNewRecord({ ...newRecord, employeeName: e.target.value })
               }
+              disabled={user?.role === "user"}
             >
-              {users.map((user) => (
-                <MenuItem key={user._id} value={user.name}>
-                  {user.name}
-                </MenuItem>
-              ))}
+              {user?.role === "user" ? (
+                <MenuItem value={user.name}>{user.name}</MenuItem>
+              ) : (
+                users.map((user) => (
+                  <MenuItem key={user._id} value={user.name}>
+                    {user.name}
+                  </MenuItem>
+                ))
+              )}
             </Select>
           </FormControl>
 
@@ -306,7 +329,7 @@ export default function Attendance() {
             />
           </LocalizationProvider>
 
-          {/* При статусе "absent" скрываем время */}
+          {/* If the status is "absent", hide time */}
           {newRecord.status !== "absent" && (
             <>
               <TextField

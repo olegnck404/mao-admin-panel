@@ -74,7 +74,7 @@ export class User implements IEntity<string> {
 
     public deactivate(): void {
         if (!this.active) {
-            throw new ValidationError('Користувач вже деактивований');
+            throw new ValidationError('User is already deactivated');
         }
         this.active = false;
         this.updateTimestamp();
@@ -82,7 +82,7 @@ export class User implements IEntity<string> {
 
     public activate(): void {
         if (this.active) {
-            throw new ValidationError('Користувач вже активний');
+            throw new ValidationError('User is already active');
         }
         this.active = true;
         this.updateTimestamp();

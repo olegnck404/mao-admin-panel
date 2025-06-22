@@ -3,7 +3,7 @@
 import axios from "axios";
 import { Task } from "../../domain/entities/Task";
 
-// Используем переменную окружения, для удобства в докере
+// We use an environment variable for convenience in Docker
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
 
 const API_URL = `${API_BASE_URL}/tasks`;

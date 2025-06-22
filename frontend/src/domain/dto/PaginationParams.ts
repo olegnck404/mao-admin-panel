@@ -5,8 +5,8 @@ export class PaginationParams {
     public readonly sortBy?: string,
     public readonly sortOrder: 'asc' | 'desc' = 'asc'
   ) {
-    if (page < 1) throw new Error('Сторінка повинна бути більше 0');
-    if (limit < 1) throw new Error('Ліміт повинен бути більше 0');
+    if (page < 1) throw new Error('Page must be greater than 0');
+    if (limit < 1) throw new Error('Limit must be greater than 0');
   }
 
   public getOffset(): number {

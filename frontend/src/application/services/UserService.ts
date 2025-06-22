@@ -1,6 +1,7 @@
 import { Injectable } from '../../core/di/decorators';
 import { Result } from '../../core/Result';
-import { PaginationParams, UserFilters } from '../../domain/dto/QueryParams';
+import { PaginationParams } from '../../domain/dto/PaginationParams';
+import { UserFilters } from '../../domain/dto/QueryParams';
 import { UserDTO } from '../../domain/dto/UserDTO';
 import { User } from '../../domain/entities/User';
 import { ApplicationError } from '../../domain/errors/ApplicationError';
@@ -20,7 +21,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
                 return Result.fail(
                     new ApplicationError(
                         'DUPLICATE_EMAIL',
-                        'Користувач з такою електронною поштою вже існує'
+                        'User with this email already exists'
                     )
                 );
             }
@@ -34,7 +35,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
             return await this.save(user);
         } catch (error) {
             return Result.fail(
-                this.handleError(error, 'CREATE_USER_ERROR', 'Помилка при створенні користувача')
+                this.handleError(error, 'CREATE_USER_ERROR', 'Error creating user')
             );
         }
     }
@@ -57,7 +58,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
                     return Result.fail(
                         new ApplicationError(
                             'DUPLICATE_EMAIL',
-                            'Користувач з такою електронною поштою вже існує'
+                            'User with this email already exists'
                         )
                     );
                 }
@@ -70,7 +71,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
             return await this.update(user);
         } catch (error) {
             return Result.fail(
-                this.handleError(error, 'UPDATE_USER_ERROR', 'Помилка при оновленні користувача')
+                this.handleError(error, 'UPDATE_USER_ERROR', 'Error updating user')
             );
         }
     }
@@ -81,7 +82,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
             return Result.ok(user);
         } catch (error) {
             return Result.fail(
-                this.handleError(error, 'FETCH_ERROR', 'Помилка при пошуку користувача')
+                this.handleError(error, 'FETCH_ERROR', 'Error finding user')
             );
         }
     }
@@ -110,7 +111,7 @@ export class UserService extends BaseService<User, string, UserFilters> {
             return Result.ok();
         } catch (error) {
             return Result.fail(
-                this.handleError(error, 'DEACTIVATE_ERROR', 'Помилка при деактивації користувача')
+                this.handleError(error, 'DEACTIVATE_ERROR', 'Error deactivating user')
             );
         }
     }

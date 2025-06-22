@@ -1,8 +1,8 @@
 import { Injectable } from '../../core/di/decorators';
-import { IBaseRepository } from '../../domain/interfaces/IRepository';
-import { PaginationParams } from '../../domain/dto/PaginationParams';
 import { Result } from '../../core/Result';
+import { PaginationParams } from '../../domain/dto/PaginationParams';
 import { ApplicationError } from '../../domain/errors/ApplicationError';
+import { IBaseRepository } from '../../domain/interfaces/IRepository';
 
 @Injectable()
 export abstract class BaseService<T, TId = string, TFilters = any> {
@@ -22,7 +22,7 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
       return Result.ok({ items, total });
     } catch (error) {
       return Result.fail(
-        this.handleError(error, 'FETCH_ERROR', 'Помилка при отриманні даних')
+        this.handleError(error, 'FETCH_ERROR', 'Error fetching data')
       );
     }
   }
@@ -34,14 +34,14 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
         return Result.fail(
           new ApplicationError(
             'NOT_FOUND',
-            `Сутність з ID ${String(id)} не знайдена`
+            `Entity with ID ${String(id)} not found`
           )
         );
       }
       return Result.ok(entity);
     } catch (error) {
       return Result.fail(
-        this.handleError(error, 'FETCH_ERROR', 'Помилка при отриманні даних')
+        this.handleError(error, 'FETCH_ERROR', 'Error fetching data')
       );
     }
   }
@@ -52,7 +52,7 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
       return Result.ok(savedEntity);
     } catch (error) {
       return Result.fail(
-        this.handleError(error, 'SAVE_ERROR', 'Помилка при збереженні даних')
+        this.handleError(error, 'SAVE_ERROR', 'Error saving data')
       );
     }
   }
@@ -63,7 +63,7 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
       return Result.ok(updatedEntity);
     } catch (error) {
       return Result.fail(
-        this.handleError(error, 'UPDATE_ERROR', 'Помилка при оновленні даних')
+        this.handleError(error, 'UPDATE_ERROR', 'Error updating data')
       );
     }
   }
@@ -74,7 +74,7 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
       return Result.ok();
     } catch (error) {
       return Result.fail(
-        this.handleError(error, 'DELETE_ERROR', 'Помилка при видаленні даних')
+        this.handleError(error, 'DELETE_ERROR', 'Error deleting data')
       );
     }
   }
@@ -89,8 +89,7 @@ export abstract class BaseService<T, TId = string, TFilters = any> {
     }
     return new ApplicationError(
       code,
-      error instanceof Error ? error.message : defaultMessage,
-      error
+      error instanceof Error ? error.message : defaultMessage
     );
   }
 }

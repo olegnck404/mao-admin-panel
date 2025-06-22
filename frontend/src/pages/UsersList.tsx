@@ -1,21 +1,21 @@
+import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-import CleaningServicesIcon from "@mui/icons-material/CleaningServices";
 import {
-  Avatar,
-  Box,
-  CircularProgress,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-  Button,
-  Stack,
+    Avatar,
+    Box,
+    Button,
+    CircularProgress,
+    IconButton,
+    Paper,
+    Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
 } from "@mui/material";
 import axios from "axios";
 import { useSnackbar } from "notistack";
@@ -97,7 +97,7 @@ export default function UsersList() {
     }
   };
 
-  // Очистка БД
+  // Clear DB
   const handleClearDatabase = async () => {
     if (
       !window.confirm(
@@ -129,7 +129,7 @@ export default function UsersList() {
           startIcon={<CleaningServicesIcon />}
           onClick={handleClearDatabase}
         >
-          Очистить БД
+          Clear DB
         </Button>
       </Stack>
 

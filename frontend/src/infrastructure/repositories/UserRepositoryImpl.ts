@@ -1,6 +1,6 @@
 import { Injectable } from '../../core/di/decorators';
 import { PaginationParams } from '../../domain/dto/PaginationParams';
-import { UserFilters } from '../../domain/dto/UserFilters';
+import { UserFilters } from '../../domain/dto/QueryParams';
 import { User } from '../../domain/entities/User';
 import { ApplicationError } from '../../domain/errors/ApplicationError';
 import { IUserRepository } from '../../domain/repositories/IUserRepository';
@@ -12,7 +12,7 @@ export class UserRepositoryImpl implements IUserRepository {
 
   async findAll(pagination: PaginationParams, filters?: UserFilters): Promise<User[]> {
     try {
-      const response = await this.api.getUsers(pagination, filters);
+      const response = await this.api.fetchUsers(pagination, filters);
       return response.items.map(userData => new User(
         userData.id,
         userData.name,
@@ -22,8 +22,7 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USERS_FETCH_ERROR',
-        'Помилка при отриманні списку користувачів',
-        error
+        'Error getting user list'
       );
     }
   }
@@ -40,8 +39,7 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USER_FETCH_ERROR',
-        `Помилка при отриманні користувача: ${id}`,
-        error
+        `Error getting user: ${id}`
       );
     }
   }
@@ -63,8 +61,7 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USER_CREATE_ERROR',
-        'Помилка при створенні користувача',
-        error
+        'Error creating user'
       );
     }
   }
@@ -85,8 +82,7 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USER_UPDATE_ERROR',
-        'Помилка при оновленні користувача',
-        error
+        'Error updating user'
       );
     }
   }
@@ -97,8 +93,7 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USER_DELETE_ERROR',
-        'Помилка при видаленні користувача',
-        error
+        'Error deleting user'
       );
     }
   }
@@ -110,9 +105,23 @@ export class UserRepositoryImpl implements IUserRepository {
     } catch (error) {
       throw new ApplicationError(
         'USERS_COUNT_ERROR',
-        'Помилка при підрахунку користувачів',
-        error
+        'Error counting users'
       );
     }
+  }
+
+  async findByEmail(email: string): Promise<User | null> {
+    // TODO: implement
+    return null;
+  }
+
+  async findActive(params: PaginationParams): Promise<User[]> {
+    // TODO: implement
+    return [];
+  }
+
+  async countActive(): Promise<number> {
+    // TODO: implement
+    return 0;
   }
 }

@@ -46,6 +46,31 @@ export class UserApi {
     }
   }
 
+  async getUser(id: string): Promise<IUser | null> {
+    // TODO: implement
+    return null;
+  }
+
+  async createUser(user: IUser): Promise<IUser> {
+    // TODO: implement
+    return user;
+  }
+
+  async updateUser(id: string, user: Partial<IUser>): Promise<IUser> {
+    // TODO: implement
+    return { ...user, id } as IUser;
+  }
+
+  async deleteUser(id: string): Promise<void> {
+    // TODO: implement
+    return;
+  }
+
+  async getUsersCount(filters?: UserFilters): Promise<{ total: number }> {
+    // TODO: implement
+    return { total: 0 };
+  }
+
   private handleResponseError(response: Response): never {
     switch (response.status) {
       case 404:

@@ -21,20 +21,20 @@ export const UsersPage: React.FC<UsersPageProps> = ({
     const { pagination, setPagination } = usePagination(initialPagination);
     const { users, loading, error, totalCount } = useUsers(filters, pagination);
 
-    if (loading) return <div>Завантаження...</div>;
-    if (error) return <div>Помилка: {error.message}</div>;
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error: {error.message}</div>;
 
     const columns = [
-        { key: 'name', title: 'Ім\'я' },
+        { key: 'name', title: 'Name' },
         { key: 'email', title: 'Email' },
-        { key: 'role', title: 'Роль', 
+        { key: 'role', title: 'Role', 
           render: (role: UserRole) => role.toString() 
         }
     ];
 
     return (
         <div className="users-page">
-            <h1>Користувачі</h1>
+            <h1>Users</h1>
             
             <Table 
                 data={users}

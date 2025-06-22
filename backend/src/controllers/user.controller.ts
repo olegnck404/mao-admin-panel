@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import RewardFine from '../models/RewardFine'; // импорт модели наград и штрафов
+import RewardFine from '../models/RewardFine'; // Import RewardFine model
 import User from '../models/User';
 
 export const getUsers = async (req: Request, res: Response): Promise<void> => {
@@ -110,6 +110,7 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: 'Server error', error });
   }
 };
+
 export const updateUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
@@ -117,7 +118,7 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 
     const updateData: any = { name, email, role };
     if (password && password.trim() !== '') {
-      updateData.password = password; // Здесь, возможно, нужен хеш пароля, если у вас есть обработка
+      updateData.password = password; // A password hash might be needed here if you have processing for it
     }
 
     const updatedUser = await User.findByIdAndUpdate(userId, updateData, {

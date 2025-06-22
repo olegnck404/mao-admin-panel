@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import Attendance from '../models/Attendance';
 
-// Получить все записи посещаемости (сортировать по дате)
+// Get all attendance records (sort by date)
 export const getAttendanceRecords = async (req: Request, res: Response): Promise<void> => {
   try {
     const records = await Attendance.find().sort({ date: -1 });
@@ -11,7 +11,7 @@ export const getAttendanceRecords = async (req: Request, res: Response): Promise
   }
 };
 
-// Создать новую запись посещаемости
+// Create a new attendance record
 export const createAttendanceRecord = async (req: Request, res: Response): Promise<void> => {
   try {
     const { employeeName, date, checkIn, checkOut } = req.body;
@@ -30,7 +30,7 @@ export const createAttendanceRecord = async (req: Request, res: Response): Promi
   }
 };
 
-// Обновить запись посещаемости по id
+// Update an attendance record by id
 export const updateAttendanceRecord = async (req: Request, res: Response): Promise<void> => {
   try {
     const recordId = req.params.id;
@@ -53,7 +53,7 @@ export const updateAttendanceRecord = async (req: Request, res: Response): Promi
   }
 };
 
-// Удалить запись посещаемости по id
+// Delete an attendance record by id
 export const deleteAttendanceRecord = async (req: Request, res: Response): Promise<void> => {
   try {
     const recordId = req.params.id;

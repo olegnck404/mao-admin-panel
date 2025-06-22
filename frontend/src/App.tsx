@@ -3,7 +3,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { SnackbarProvider } from "notistack";
 import { useEffect, useState } from "react";
 import { BrowserRouter, useRoutes } from "react-router-dom";
-import { AuthContext } from "./contexts/AuthContext";
+import { AuthProvider } from "./contexts/AuthContext"; // <-- IMPORTANT!
 import { ThemeContext } from "./contexts/ThemeContext";
 import { routes } from "./routes";
 import { darkTheme, lightTheme } from "./theme";
@@ -21,27 +21,16 @@ export default function App() {
       : "light";
   });
 
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return localStorage.getItem("isAuthenticated") === "true";
-  });
-
   useEffect(() => {
     localStorage.setItem("themeMode", mode);
   }, [mode]);
 
-  useEffect(() => {
-    localStorage.setItem("isAuthenticated", String(isAuthenticated));
-  }, [isAuthenticated]);
-
   const toggleTheme = () => setMode(mode === "light" ? "dark" : "light");
-  const login = () => setIsAuthenticated(true);
-  const logout = () => setIsAuthenticated(false);
-
   const theme = mode === "light" ? lightTheme : darkTheme;
 
   return (
     <BrowserRouter>
-      <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+      <AuthProvider>
         <ThemeContext.Provider value={{ mode, toggleTheme }}>
           <ThemeProvider theme={theme}>
             <CssBaseline />
@@ -53,7 +42,7 @@ export default function App() {
             </SnackbarProvider>
           </ThemeProvider>
         </ThemeContext.Provider>
-      </AuthContext.Provider>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

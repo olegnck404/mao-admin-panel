@@ -43,25 +43,25 @@ export class Container {
   }
 
   public resolve<T>(token: Constructor<T>): T {
-    // Проверяем синглтон
+    // Check for singleton
     const singleton = this.singletons.get(token);
     if (singleton) {
       return singleton;
     }
 
-    // Проверяем зарегистрированную зависимость
+    // Check for registered dependency
     const dependency = this.dependencies.get(token);
     if (dependency) {
       return dependency;
     }
 
-    // Создаем новый экземпляр
+    // Create a new instance
     if (Reflect.hasMetadata('injectable', token)) {
       const params = Reflect.getMetadata('params', token) || [];
       const dependencies = params.map((param: Constructor) => this.resolve(param));
       const instance = new token(...dependencies);
 
-      // Если это синглтон, сохраняем инстанс
+      // If it's a singleton, save the instance
       if (Reflect.hasMetadata('singleton', token)) {
         this.singletons.set(token, instance);
       }
@@ -69,7 +69,7 @@ export class Container {
       return instance;
     }
 
-    throw new Error(`Не вдалося створити екземпляр ${token.name}. Переконайтеся, що клас позначено як @Injectable()`);
+    throw new Error(`Failed to create an instance of ${token.name}. Make sure the class is marked with @Injectable()`);
   }
 
   public clearContainer(): void {

@@ -1,5 +1,5 @@
 // frontend/src/pages/Dashboard.tsx
-// Проверь точный путь и название файла
+// Check exact path and file name
 import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
 import PaidRoundedIcon from "@mui/icons-material/PaidRounded";
@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import { keyframes } from "@mui/system";
 import React, { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 import { fetchDashboardData } from "../infrastructure/api/dashboardApi";
 
 const fadeInUp = keyframes`
@@ -136,6 +137,7 @@ const StatCard = ({
 );
 
 interface ActivityItemProps {
+  id?: string; // Add optional id field
   avatar: string;
   name: string;
   action: string;
@@ -265,6 +267,7 @@ interface DashboardData {
 }
 
 export default function Dashboard() {
+  const { user } = useAuth();
   const [data, setData] = useState<DashboardData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -286,6 +289,23 @@ export default function Dashboard() {
     return (
       <Box sx={{ p: 3 }}>
         <Typography>Loading...</Typography>
+      </Box>
+    );
+  }
+
+  // If employee - show only their statistics
+  if (user?.role === "user") {
+    return (
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h4" gutterBottom fontWeight="600">
+          My Dashboard
+        </Typography>
+        {/* Here you can display personal tasks, attendance, rewards/penalties, statistics */}
+        {/* For example, components like MyStats, MyTasks, MyAttendance, MyRewards etc. */}
+        <Typography>
+          Here will be your personal statistics, tasks, attendance and
+          rewards/penalties.
+        </Typography>
       </Box>
     );
   }

@@ -1,5 +1,5 @@
+import { ValidationError } from '../errors/ApplicationError';
 import { IValueObject } from '../interfaces/IEntity';
-import { ValidationError } from '../errors/ValidationError';
 
 export class Email implements IValueObject<string> {
     private readonly value: string;
@@ -20,12 +20,12 @@ export class Email implements IValueObject<string> {
 
     private validate(email: string): void {
         if (!email) {
-            throw new ValidationError('Email не може бути порожнім');
+            throw new ValidationError('Email cannot be empty');
         }
 
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
-            throw new ValidationError('Невірний формат email');
+            throw new ValidationError('Invalid email format');
         }
     }
 }
@@ -49,10 +49,10 @@ export class UserName implements IValueObject<string> {
 
     private validate(name: string): void {
         if (!name || name.trim().length < 2) {
-            throw new ValidationError('Ім\'я повинно містити мінімум 2 символи');
+            throw new ValidationError('Name must contain at least 2 characters');
         }
         if (name.trim().length > 50) {
-            throw new ValidationError('Ім\'я не може бути довшим за 50 символів');
+            throw new ValidationError('Name cannot be longer than 50 characters');
         }
     }
 }
@@ -78,7 +78,7 @@ export class UserRole implements IValueObject<string> {
         const upperRole = role.toUpperCase() as typeof UserRole.VALID_ROLES[number];
         if (!UserRole.VALID_ROLES.includes(upperRole)) {
             throw new ValidationError(
-                `Невірна роль. Дозволені значення: ${UserRole.VALID_ROLES.join(', ')}`
+                `Invalid role. Allowed values: ${UserRole.VALID_ROLES.join(', ')}`
             );
         }
         return new UserRole(upperRole);

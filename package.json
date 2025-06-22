@@ -20,9 +20,11 @@
     "dev": "npm run dev:all"
   },
   "dependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.19",
     "typescript": "^5.3.3"
   }
 }

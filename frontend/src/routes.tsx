@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Rewards from "./pages/Rewards";
 import Tasks from "./pages/Tasks";
+import UserCabinet from "./pages/UserCabinet";
 
 export const routes: RouteObject[] = [
   {
@@ -44,11 +45,23 @@ export const routes: RouteObject[] = [
         path: "users-list",
         element: <UsersList />,
       },
+      {
+        path: "cabinet",
+        element: <UserCabinet />,
+      },
     ],
   },
   {
     path: "/mao-admin-panel/login",
     element: <Login />,
+  },
+  {
+    path: "/user-cabinet",
+    element: (
+      <ProtectedRoute>
+        <UserCabinet />
+      </ProtectedRoute>
+    ),
   },
   {
     path: "*",

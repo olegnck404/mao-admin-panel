@@ -2,31 +2,31 @@ import AddIcon from "@mui/icons-material/Add";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SearchIcon from "@mui/icons-material/Search";
 import {
-  Box,
-  Button,
-  Checkbox,
-  Chip,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  OutlinedInput,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Typography,
-  useMediaQuery,
-  useTheme,
+    Box,
+    Button,
+    Checkbox,
+    Chip,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+    ListItemText,
+    MenuItem,
+    OutlinedInput,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
@@ -34,27 +34,30 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface Task {
   _id: string;
   title: string;
   isGlobal: boolean;
-  assignees: string[]; // для общих задач
-  assignee?: string; // для личных
+  assignees: string[]; // for global tasks
+  assignee?: string; // for personal tasks
   dueDate: string; // ISO string
   priority: "High" | "Medium" | "Low";
   status: "Todo" | "In Progress" | "Done";
-  completedBy: string[]; // кто выполнил
+  completedBy: string[]; // who completed
 }
 
 interface User {
   _id: string;
   name: string;
+  completedBy: [],
 }
 
 export default function Tasks() {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const { user } = useAuth();
 
   const [tasks, setTasks] = useState<Task[]>([]);
   const [users, setUsers] = useState<User[]>([]);
@@ -74,7 +77,9 @@ export default function Tasks() {
     completedBy: [],
   });
 
-  // Загрузка юзеров с бекенда
+  const [addTaskError, setAddTaskError] = useState<string>("");
+
+  // Loading users from the backend
   const fetchUsers = async () => {
     try {
       const res = await axios.get<User[]>("/api/users");
@@ -84,7 +89,7 @@ export default function Tasks() {
     }
   };
 
-  // Загрузка тасков с бекенда, с дефолтами для полей
+  // Loading tasks from the backend, with defaults for fields
   const fetchTasks = async () => {
     try {
       const res = await axios.get<Task[]>("/api/task");
@@ -104,8 +109,20 @@ export default function Tasks() {
     fetchTasks();
   }, []);
 
-  // Фильтрация тасков по ID и пользователю (ассигни)
+  useEffect(() => {
+    console.log("TASKS FROM BACKEND:", tasks);
+  }, [tasks]);
+
+  // Filtering tasks by user (for an employee — only their own and global)
   const filteredTasks = tasks.filter((task) => {
+    if (!user) return false;
+    if (user.role === "user") {
+      return (
+        (task.isGlobal && task.assignees.includes(user.name)) ||
+        (!task.isGlobal && task.assignee === user.name)
+      );
+    }
+    // For admin/manager — filtering by search and filter
     const matchesSearch = task._id.includes(searchQuery);
     const matchesUser =
       !filterUser ||
@@ -114,28 +131,32 @@ export default function Tasks() {
     return matchesSearch && matchesUser;
   });
 
-  // Добавление новой задачи
+  // Adding a new task
+  const isTaskFormValid =
+    !!newTask.title &&
+    ((newTask.isGlobal && newTask.assignees && newTask.assignees.length > 0) ||
+      (!newTask.isGlobal && newTask.assignee));
+
   const handleAddTask = async () => {
-    if (
-      !newTask.title ||
-      (!newTask.assignee && !newTask.isGlobal) ||
-      (newTask.isGlobal &&
-        (!newTask.assignees || newTask.assignees.length === 0))
-    ) {
-      alert("Please fill all required fields");
+    setAddTaskError("");
+    alert("handleAddTask called");
+    if (!isTaskFormValid) {
+      setAddTaskError("Please fill all required fields");
       return;
     }
     try {
       const taskToSend = {
         ...newTask,
-        dueDate:
-          typeof newTask.dueDate === "string"
-            ? newTask.dueDate
-            : newTask.dueDate?.toISOString(),
-        assignees: newTask.isGlobal ? newTask.assignees : [],
+        dueDate: newTask.dueDate || new Date().toISOString(),
+        assignees: newTask.isGlobal
+          ? newTask.assignees
+          : newTask.assignee
+          ? [newTask.assignee]
+          : [],
         isGlobal: newTask.isGlobal,
       };
-      await axios.post("/api/task", taskToSend);
+      console.log("SENDING TASK:", taskToSend);
+      const res = await axios.post("/api/task", taskToSend);
       setOpenDialog(false);
       setNewTask({
         title: "",
@@ -148,12 +169,13 @@ export default function Tasks() {
         completedBy: [],
       });
       fetchTasks();
-    } catch (error) {
+    } catch (error: any) {
+      setAddTaskError(error?.response?.data?.message || "Failed to add task");
       console.error("Failed to add task", error);
     }
   };
 
-  // Удаление выбранных задач
+  // Deleting selected tasks
   const handleDeleteTasks = async (ids: string[]) => {
     try {
       await Promise.all(ids.map((id) => axios.delete(`/api/task/${id}`)));
@@ -164,7 +186,7 @@ export default function Tasks() {
     }
   };
 
-  // Тоггл статуса персональной задачи (выполнено/не выполнено)
+  // Toggle status of a personal task (completed/not completed)
   const togglePersonalComplete = async (task: Task) => {
     try {
       const isCompleted = task.completedBy.includes(task.assignee || "");
@@ -181,7 +203,7 @@ export default function Tasks() {
     }
   };
 
-  // Тоггл статуса конкретного работника в общей задаче
+  // Toggle status of a specific employee in a global task
   const toggleCommonComplete = async (task: Task, user: string) => {
     try {
       let updatedCompletedBy = task.completedBy.includes(user)
@@ -202,7 +224,7 @@ export default function Tasks() {
     }
   };
 
-  // Отметить все/снять отметку со всех работников общей задачи
+  // Mark all/unmark all employees in a global task
   const toggleCompleteAll = async (task: Task) => {
     try {
       const allCompleted = task.completedBy.length === task.assignees.length;
@@ -219,7 +241,7 @@ export default function Tasks() {
     }
   };
 
-  // Выделение задач для удаления
+  // Selecting tasks for deletion
   const toggleSelectTask = (taskId: string) => {
     setSelectedTaskIds((prev) =>
       prev.includes(taskId)
@@ -228,7 +250,7 @@ export default function Tasks() {
     );
   };
 
-  // Цвета для приоритета и статуса
+  // Colors for priority and status
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "High":
@@ -257,7 +279,7 @@ export default function Tasks() {
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      {/* Фильтры и поиск */}
+      {/* Filters and search */}
       <Box
         sx={{
           mb: 3,
@@ -278,43 +300,48 @@ export default function Tasks() {
             ),
           }}
         />
-        <FormControl sx={{ minWidth: 180 }}>
-          <InputLabel>Filter by User</InputLabel>
-          <Select
-            value={filterUser}
-            label="Filter by User"
-            onChange={(e) => setFilterUser(e.target.value)}
-          >
-            <MenuItem value="">All</MenuItem>
-            {users.map((user) => (
-              <MenuItem key={user._id} value={user.name}>
-                {user.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <Button
-          variant="contained"
-          color="error"
-          startIcon={<DeleteIcon />}
-          disabled={selectedTaskIds.length === 0}
-          onClick={() => handleDeleteTasks(selectedTaskIds)}
-          sx={{ minWidth: 130 }}
-        >
-          Delete Selected
-        </Button>
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AddIcon />}
-          onClick={() => setOpenDialog(true)}
-          sx={{ minWidth: 130 }}
-        >
-          Add Task
-        </Button>
+        {/* Only for admin/manager filter by user and buttons */}
+        {user?.role !== "user" && (
+          <>
+            <FormControl sx={{ minWidth: 180 }}>
+              <InputLabel>Filter by User</InputLabel>
+              <Select
+                value={filterUser}
+                label="Filter by User"
+                onChange={(e) => setFilterUser(e.target.value)}
+              >
+                <MenuItem value="">All</MenuItem>
+                {users.map((user) => (
+                  <MenuItem key={user._id} value={user.name}>
+                    {user.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <Button
+              variant="contained"
+              color="error"
+              startIcon={<DeleteIcon />}
+              disabled={selectedTaskIds.length === 0}
+              onClick={() => handleDeleteTasks(selectedTaskIds)}
+              sx={{ minWidth: 130 }}
+            >
+              Delete Selected
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<AddIcon />}
+              onClick={() => setOpenDialog(true)}
+              sx={{ minWidth: 130 }}
+            >
+              Add Task
+            </Button>
+          </>
+        )}
       </Box>
 
-      {/* Таблица задач */}
+      {/* Tasks table */}
       <TableContainer component={Paper} sx={{ flex: 1 }}>
         <Table>
           <TableHead>
@@ -425,143 +452,161 @@ export default function Tasks() {
         </Table>
       </TableContainer>
 
-      {/* Диалог добавления задачи */}
-      <Dialog
-        open={openDialog}
-        onClose={() => setOpenDialog(false)}
-        maxWidth="sm"
-        fullWidth
-      >
-        <DialogTitle>Add New Task</DialogTitle>
-        <DialogContent>
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}>
-            <TextField
-              label="Title"
-              fullWidth
-              value={newTask.title}
-              onChange={(e) =>
-                setNewTask({ ...newTask, title: e.target.value })
-              }
-            />
-            <FormControl fullWidth>
-              <InputLabel>Type</InputLabel>
-              <Select
-                value={newTask.isGlobal ? "common" : "personal"}
-                label="Type"
+      {/* Add task dialog — only for admin/manager */}
+      {user?.role !== "user" && (
+        <Dialog
+          open={openDialog}
+          onClose={() => setOpenDialog(false)}
+          maxWidth="sm"
+          fullWidth
+        >
+          <DialogTitle>Add New Task</DialogTitle>
+          <DialogContent>
+            <Box
+              sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 2 }}
+            >
+              <TextField
+                label="Title"
+                fullWidth
+                value={newTask.title}
                 onChange={(e) =>
-                  setNewTask({
-                    ...newTask,
-                    isGlobal: e.target.value === "common",
-                    assignee: "",
-                    assignees: [],
-                  })
+                  setNewTask({ ...newTask, title: e.target.value })
                 }
-              >
-                <MenuItem value="personal">Personal</MenuItem>
-                <MenuItem value="common">Common</MenuItem>
-              </Select>
-            </FormControl>
-            {newTask.isGlobal ? (
+              />
               <FormControl fullWidth>
-                <InputLabel>Assignees</InputLabel>
+                <InputLabel>Type</InputLabel>
                 <Select
-                  multiple
-                  value={newTask.assignees || []}
+                  value={newTask.isGlobal ? "common" : "personal"}
+                  label="Type"
                   onChange={(e) =>
                     setNewTask({
                       ...newTask,
-                      assignees: e.target.value as string[],
+                      isGlobal: e.target.value === "common",
+                      assignee: "",
+                      assignees: [],
                     })
                   }
-                  input={<OutlinedInput label="Assignees" />}
-                  renderValue={(selected) => (selected as string[]).join(", ")}
                 >
-                  {users.map((user) => (
-                    <MenuItem key={user._id} value={user.name}>
-                      <Checkbox
-                        checked={newTask.assignees?.includes(user.name)}
-                      />
-                      <ListItemText primary={user.name} />
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="personal">Personal</MenuItem>
+                  <MenuItem value="common">Common</MenuItem>
                 </Select>
               </FormControl>
-            ) : (
+              {newTask.isGlobal ? (
+                <FormControl fullWidth>
+                  <InputLabel>Assignees</InputLabel>
+                  <Select
+                    multiple
+                    value={newTask.assignees || []}
+                    onChange={(e) =>
+                      setNewTask({
+                        ...newTask,
+                        assignees: e.target.value as string[],
+                      })
+                    }
+                    input={<OutlinedInput label="Assignees" />}
+                    renderValue={(selected) =>
+                      (selected as string[]).join(", ")
+                    }
+                  >
+                    {users.map((user) => (
+                      <MenuItem key={user._id} value={user.name}>
+                        <Checkbox
+                          checked={newTask.assignees?.includes(user.name)}
+                        />
+                        <ListItemText primary={user.name} />
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              ) : (
+                <FormControl fullWidth>
+                  <InputLabel>Assignee</InputLabel>
+                  <Select
+                    value={newTask.assignee || ""}
+                    label="Assignee"
+                    onChange={(e) =>
+                      setNewTask({ ...newTask, assignee: e.target.value })
+                    }
+                  >
+                    {users.map((user) => (
+                      <MenuItem key={user._id} value={user.name}>
+                        {user.name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              )}
+              <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DatePicker
+                  label="Due Date"
+                  value={newTask.dueDate ? new Date(newTask.dueDate) : null}
+                  onChange={(date) =>
+                    setNewTask({
+                      ...newTask,
+                      dueDate: date
+                        ? date.toISOString()
+                        : new Date().toISOString(),
+                    })
+                  }
+                  slotProps={{
+                    textField: { fullWidth: true, margin: "dense" },
+                  }}
+                />
+              </LocalizationProvider>
               <FormControl fullWidth>
-                <InputLabel>Assignee</InputLabel>
+                <InputLabel>Priority</InputLabel>
                 <Select
-                  value={newTask.assignee || ""}
-                  label="Assignee"
+                  value={newTask.priority || "Medium"}
+                  label="Priority"
                   onChange={(e) =>
-                    setNewTask({ ...newTask, assignee: e.target.value })
+                    setNewTask({
+                      ...newTask,
+                      priority: e.target.value as Task["priority"],
+                    })
                   }
                 >
-                  {users.map((user) => (
-                    <MenuItem key={user._id} value={user.name}>
-                      {user.name}
-                    </MenuItem>
-                  ))}
+                  <MenuItem value="High">High</MenuItem>
+                  <MenuItem value="Medium">Medium</MenuItem>
+                  <MenuItem value="Low">Low</MenuItem>
                 </Select>
               </FormControl>
-            )}
-            <LocalizationProvider dateAdapter={AdapterDateFns}>
-              <DatePicker
-                label="Due Date"
-                value={newTask.dueDate ? new Date(newTask.dueDate) : null}
-                onChange={(date) =>
-                  setNewTask({
-                    ...newTask,
-                    dueDate: date
-                      ? date.toISOString()
-                      : new Date().toISOString(),
-                  })
-                }
-                slotProps={{ textField: { fullWidth: true, margin: "dense" } }}
-              />
-            </LocalizationProvider>
-            <FormControl fullWidth>
-              <InputLabel>Priority</InputLabel>
-              <Select
-                value={newTask.priority || "Medium"}
-                label="Priority"
-                onChange={(e) =>
-                  setNewTask({
-                    ...newTask,
-                    priority: e.target.value as Task["priority"],
-                  })
-                }
-              >
-                <MenuItem value="High">High</MenuItem>
-                <MenuItem value="Medium">Medium</MenuItem>
-                <MenuItem value="Low">Low</MenuItem>
-              </Select>
-            </FormControl>
-            <FormControl fullWidth>
-              <InputLabel>Status</InputLabel>
-              <Select
-                value={newTask.status || "Todo"}
-                label="Status"
-                onChange={(e) =>
-                  setNewTask({
-                    ...newTask,
-                    status: e.target.value as Task["status"],
-                  })
-                }
-              >
-                <MenuItem value="Todo">Todo</MenuItem>
-                <MenuItem value="In Progress">In Progress</MenuItem>
-                <MenuItem value="Done">Done</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-          <Button onClick={handleAddTask} variant="contained" color="primary">
-            Add Task
-          </Button>
-        </DialogActions>
-      </Dialog>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={newTask.status || "Todo"}
+                  label="Status"
+                  onChange={(e) =>
+                    setNewTask({
+                      ...newTask,
+                      status: e.target.value as Task["status"],
+                    })
+                  }
+                >
+                  <MenuItem value="Todo">Todo</MenuItem>
+                  <MenuItem value="In Progress">In Progress</MenuItem>
+                  <MenuItem value="Done">Done</MenuItem>
+                </Select>
+              </FormControl>
+              {addTaskError && (
+                <Typography color="error" sx={{ mt: 1, mb: 1 }}>
+                  {addTaskError}
+                </Typography>
+              )}
+            </Box>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
+            <Button
+              onClick={handleAddTask}
+              variant="contained"
+              color="primary"
+              disabled={!isTaskFormValid}
+            >
+              Add Task
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   );
 }

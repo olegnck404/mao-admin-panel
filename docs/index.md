@@ -1,36 +1,14 @@
----
-aliases: [Головна, Home]
-tags: [documentation, mao-admin-panel]
-created: 2025-05-12
----
+# MAO Admin Panel: Project Documentation
 
-# MAO Admin Panel
+Welcome to the official documentation for the MAO Admin Panel. This project is a qualifying work for the confirmation of the degree of a professional junior bachelor.
 
-## Навігація
+This site contains all the necessary documentation to understand, run, and contribute to the project.
 
-- [[architecture|Архітектура]]
-- [[api|API Документація]]
-- [[components|Компоненти]]
-- [[development-guide|Керівництво розробника]]
+## Table of Contents
 
-## Швидкі посилання
-
-- 🏗️ [[architecture#Шари архітектури|Шари архітектури]]
-- 🔧 [[development-guide#Початок роботи|Початок роботи]]
-- 📡 [[api#Endpoints|API Endpoints]]
-- 🧩 [[components#Основні компоненти|Компоненти]]
-
-## Огляд проекту
-
-![[architecture#Clean Architecture]]
-
-## Технічний стек
-
-- ⚛️ React
-- 📘 TypeScript
-- ⚡ Vite
-- 🔍 ESLint
-
-## Теги
-
-#react #typescript #clean-architecture #solid
+- [[Introduction|Introduction]]
+- [[Getting Started|Getting Started]]
+- [[Architecture|System Architecture]]
+- [[Backend|Backend Guide]]
+- [[Frontend|Frontend Guide]]
+- [[Deployment|Deployment]]

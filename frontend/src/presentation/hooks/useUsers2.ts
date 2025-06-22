@@ -50,7 +50,7 @@ export const useUsers = (
       setError(
         err instanceof ApplicationError
           ? err
-          : new ApplicationError('UNKNOWN_ERROR', 'Невідома помилка при завантаженні користувачів')
+          : new ApplicationError('UNKNOWN_ERROR', 'Unknown error while loading users')
       );
     } finally {
       setLoading(false);
@@ -62,12 +62,12 @@ export const useUsers = (
   }, [fetchUsers]);
 
   const setPage = useCallback((page: number) => {
-    setPagination(prev => new PaginationParams(page, prev.limit));
+    setPagination((prev: PaginationParams) => new PaginationParams(page, prev.limit));
   }, []);
 
   const updateFilters = useCallback((newFilters: UserFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    setPagination(prev => new PaginationParams(1, prev.limit)); // Сброс на первую страницу
+    setFilters((prev: UserFilters) => ({ ...prev, ...newFilters }));
+    setPagination((prev: PaginationParams) => new PaginationParams(1, prev.limit)); // Reset to the first page
   }, []);
 
   return {

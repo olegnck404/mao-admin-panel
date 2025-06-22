@@ -17,14 +17,14 @@ const UserForm = () => {
         body: JSON.stringify(formData),
       });
       if (response.ok) {
-        // Обработка успешного ответа
+        // Handling a successful response
         setFormData({ name: "", email: "" });
       } else {
-        // Обработка ошибки
-        console.error("Ошибка при создании пользователя");
+        // Error handling
+        console.error("Error creating user");
       }
     } catch (error) {
-      console.error("Ошибка сети:", error);
+      console.error("Network error:", error);
     }
   };
 
@@ -35,7 +35,7 @@ const UserForm = () => {
       sx={{ maxWidth: 400, mx: "auto" }}
     >
       <TextField
-        label="Имя"
+        label="Name"
         name="name"
         value={formData.name}
         onChange={handleChange}
@@ -54,7 +54,7 @@ const UserForm = () => {
         required
       />
       <Button type="submit" variant="contained" color="primary" fullWidth>
-        Создать пользователя
+        Create User
       </Button>
     </Box>
   );

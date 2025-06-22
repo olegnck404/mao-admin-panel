@@ -11,10 +11,10 @@ export const USER_ROLES = {
 } as const;
 
 export const ERROR_MESSAGES = {
-  NETWORK_ERROR: 'Ошибка сети. Пожалуйста, проверьте подключение к интернету.',
-  NOT_FOUND: 'Ресурс не найден.',
-  UNAUTHORIZED: 'Необходима авторизация.',
-  FORBIDDEN: 'Доступ запрещен.',
-  VALIDATION_ERROR: 'Ошибка валидации данных.',
-  UNKNOWN_ERROR: 'Произошла неизвестная ошибка.'
+  NETWORK_ERROR: 'Network error. Please check your internet connection.',
+  NOT_FOUND: 'Resource not found.',
+  UNAUTHORIZED: 'Authorization required.',
+  FORBIDDEN: 'Access denied.',
+  VALIDATION_ERROR: 'Data validation error.',
+  UNKNOWN_ERROR: 'An unknown error occurred.'
 } as const;

@@ -1,34 +1,31 @@
 import AddIcon from "@mui/icons-material/Add";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
 import TrendingDownIcon from "@mui/icons-material/TrendingDown";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import {
-  Avatar,
-  Box,
-  Button,
-  Chip,
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  TextField,
-  Tooltip,
-  Typography,
-  useTheme,
+    Avatar,
+    Box,
+    Button,
+    Chip,
+    CircularProgress,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Paper,
+    Select,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    TextField,
+    Typography,
+    useTheme,
 } from "@mui/material";
 import { alpha } from "@mui/material/styles";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
@@ -36,9 +33,10 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import axios from "axios";
 import { useSnackbar } from "notistack";
 import { useEffect, useState } from "react";
+import { useAuth } from "../contexts/AuthContext";
 
 interface RewardRecord {
-  id: number;
+  _id: string;
   employeeName: string;
   date: Date;
   type: "reward" | "penalty";
@@ -54,6 +52,7 @@ interface Employee {
 export default function Rewards() {
   const theme = useTheme();
   const { enqueueSnackbar } = useSnackbar();
+  const { user } = useAuth();
 
   const [records, setRecords] = useState<RewardRecord[]>([]);
   const [loading, setLoading] = useState(false);
@@ -68,11 +67,11 @@ export default function Rewards() {
   });
   const [searchQuery, setSearchQuery] = useState("");
 
-  // Новый стейт для сотрудников
+  // New state for employees
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loadingEmployees, setLoadingEmployees] = useState(false);
 
-  // Загрузка записей
+  // Loading records
   useEffect(() => {
     async function fetchRecords() {
       setLoading(true);
@@ -91,7 +90,7 @@ export default function Rewards() {
     fetchRecords();
   }, [enqueueSnackbar]);
 
-  // Загрузка сотрудников для dropdown
+  // Loading employees for dropdown
   useEffect(() => {
     async function fetchEmployees() {
       setLoadingEmployees(true);
@@ -162,11 +161,17 @@ export default function Rewards() {
       .filter((record) => record.type === type)
       .reduce((sum, record) => sum + record.amount, 0);
 
-  const filteredRecords = records.filter(
-    (record) =>
+  // Filtering records: employee sees only their own
+  const filteredRecords = records.filter((record) => {
+    if (!user) return false;
+    if (user.role === "user") {
+      return record.employeeName === user.name;
+    }
+    return (
       record.employeeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       record.reason.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+    );
+  });
 
   const rewardsTotal = calculateTotal("reward");
   const penaltiesTotal = calculateTotal("penalty");
@@ -174,7 +179,7 @@ export default function Rewards() {
 
   return (
     <Box>
-      {/* Заголовок, поиск, кнопки */}
+      {/* Header, search, buttons */}
       <Box
         sx={{
           display: "flex",
@@ -204,22 +209,20 @@ export default function Rewards() {
               },
             }}
           />
-          <Tooltip title="Filter">
-            <IconButton sx={{ bgcolor: "background.paper" }}>
-              <FilterListIcon />
-            </IconButton>
-          </Tooltip>
-          <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            onClick={handleOpen}
-          >
-            Add Record
-          </Button>
+          {/* Add button only for admin/manager */}
+          {user?.role !== "user" && (
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={handleOpen}
+            >
+              Add Record
+            </Button>
+          )}
         </Box>
       </Box>
 
-      {/* Состояния загрузки */}
+      {/* Loading states */}
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", py: 10 }}>
           <CircularProgress />
@@ -230,9 +233,9 @@ export default function Rewards() {
         </Typography>
       ) : (
         <>
-          {/* Статистика */}
+          {/* Statistics */}
           <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
-            {/* ... Статистика (без изменений) */}
+            {/* ... Statistics (no changes) */}
             <Paper
               sx={{ p: 3, flex: 1, position: "relative", overflow: "hidden" }}
             >
@@ -273,7 +276,7 @@ export default function Rewards() {
                 <TrendingUpIcon sx={{ fontSize: 80, color: "primary.main" }} />
               </Box>
             </Paper>
-            {/* ... Total Penalties и Net Balance (как раньше) */}
+            {/* ... Total Penalties and Net Balance (as before) */}
             <Paper
               sx={{ p: 3, flex: 1, position: "relative", overflow: "hidden" }}
             >
@@ -315,205 +318,172 @@ export default function Rewards() {
               </Box>
             </Paper>
             <Paper
-              sx={{ p: 3, flex: 1, position: "relative", overflow: "hidden" }}
+              sx={{
+                p: 3,
+                flex: 1,
+                bgcolor:
+                  netTotal >= 0
+                    ? alpha(theme.palette.success.main, 0.1)
+                    : alpha(theme.palette.error.main, 0.1),
+              }}
             >
-              <Box sx={{ position: "relative", zIndex: 1 }}>
-                <Typography variant="h6" gutterBottom fontWeight="600">
-                  Net Balance
-                </Typography>
-                <Typography
-                  variant="h3"
-                  color={netTotal >= 0 ? "success.main" : "error.main"}
-                  sx={{ mb: 1 }}
-                >
-                  ${Math.abs(netTotal)}
-                </Typography>
-                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                  {netTotal >= 0 ? (
-                    <TrendingUpIcon color="success" />
-                  ) : (
-                    <TrendingDownIcon color="error" />
-                  )}
-                  <Typography
-                    variant="body2"
-                    color={netTotal >= 0 ? "success.main" : "error.main"}
-                  >
-                    {netTotal >= 0 ? "Positive" : "Negative"} balance
-                  </Typography>
-                </Box>
-              </Box>
+              <Typography variant="h6" fontWeight="600">
+                Net Balance
+              </Typography>
+              <Typography
+                variant="h3"
+                color={netTotal >= 0 ? "success.main" : "error.main"}
+              >
+                ${netTotal}
+              </Typography>
             </Paper>
           </Box>
 
-          {/* Таблица записей */}
-          <Paper>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Employee</TableCell>
-                    <TableCell>Date</TableCell>
-                    <TableCell>Type</TableCell>
-                    <TableCell>Amount</TableCell>
-                    <TableCell>Reason</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredRecords.map((record) => (
-                    <TableRow key={record.id} hover>
-                      <TableCell>
-                        <Box
-                          sx={{ display: "flex", alignItems: "center", gap: 1 }}
-                        >
-                          <Avatar
-                            sx={{
-                              width: 24,
-                              height: 24,
-                              fontSize: "0.75rem",
-                              bgcolor: theme.palette.primary.main,
-                            }}
-                          >
-                            {record.employeeName.charAt(0)}
-                          </Avatar>
-                          {record.employeeName}
-                        </Box>
-                      </TableCell>
-                      <TableCell>{record.date.toLocaleDateString()}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={record.type}
+          {/* Table */}
+          <TableContainer component={Paper}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Employee</TableCell>
+                  <TableCell>Date</TableCell>
+                  <TableCell>Type</TableCell>
+                  <TableCell>Amount</TableCell>
+                  <TableCell>Reason</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredRecords.map((record) => (
+                  <TableRow key={record._id} hover>
+                    <TableCell>
+                      <Box
+                        sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                      >
+                        <Avatar
                           sx={{
-                            bgcolor:
-                              record.type === "reward"
-                                ? alpha(theme.palette.success.main, 0.1)
-                                : alpha(theme.palette.error.main, 0.1),
-                            color:
-                              record.type === "reward"
-                                ? theme.palette.success.main
-                                : theme.palette.error.main,
-                            fontWeight: 600,
+                            width: 24,
+                            height: 24,
+                            fontSize: "0.75rem",
+                            bgcolor: theme.palette.primary.main,
                           }}
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Typography
-                          color={
-                            record.type === "reward"
-                              ? "success.main"
-                              : "error.main"
-                          }
-                          fontWeight="600"
                         >
-                          ${record.amount}
-                        </Typography>
-                      </TableCell>
-                      <TableCell>{record.reason}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
+                          {record.employeeName.charAt(0)}
+                        </Avatar>
+                        {record.employeeName}
+                      </Box>
+                    </TableCell>
+                    <TableCell>{record.date.toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Chip
+                        label={record.type}
+                        sx={{
+                          bgcolor:
+                            record.type === "reward"
+                              ? alpha(theme.palette.success.main, 0.1)
+                              : alpha(theme.palette.error.main, 0.1),
+                          color:
+                            record.type === "reward"
+                              ? theme.palette.success.main
+                              : theme.palette.error.main,
+                          fontWeight: 600,
+                        }}
+                      />
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        color={
+                          record.type === "reward"
+                            ? "success.main"
+                            : "error.main"
+                        }
+                        fontWeight="600"
+                      >
+                        ${record.amount}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>{record.reason}</TableCell>
+                  </TableRow>
+                ))}
+                {filteredRecords.length === 0 && (
+                  <TableRow>
+                    <TableCell colSpan={5} align="center">
+                      No data
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </TableContainer>
         </>
       )}
 
-      {/* Диалог добавления записи */}
-      <Dialog
-        open={open}
-        onClose={handleClose}
-        maxWidth="sm"
-        fullWidth
-        PaperProps={{ sx: { borderRadius: 2 } }}
-      >
-        <DialogTitle sx={{ pb: 1 }}>
-          <Typography variant="h6" fontWeight="600">
-            New Record
-          </Typography>
-        </DialogTitle>
-        <DialogContent sx={{ pb: 2 }}>
-          {/* Заменили текстовое поле на Select с сотрудниками */}
-          <FormControl fullWidth margin="dense" disabled={loadingEmployees}>
-            <InputLabel>Employee Name</InputLabel>
-            <Select
-              value={newRecord.employeeName || ""}
-              label="Employee Name"
+      {/* Dialog for adding a record */}
+      {user?.role !== "user" && (
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>Add Record</DialogTitle>
+          <DialogContent sx={{ minWidth: 400 }}>
+            <LocalizationProvider dateAdapter={AdapterDateFns}>
+              <DatePicker
+                label="Date"
+                value={selectedDate}
+                onChange={(newValue: Date | null) => setSelectedDate(newValue)}
+                slotProps={{ textField: { fullWidth: true, margin: "dense" } }}
+              />
+            </LocalizationProvider>
+            <FormControl fullWidth margin="dense" disabled={loadingEmployees}>
+              <InputLabel>Employee</InputLabel>
+              <Select
+                value={newRecord.employeeName}
+                label="Employee"
+                onChange={(e) =>
+                  setNewRecord({ ...newRecord, employeeName: e.target.value })
+                }
+              >
+                {employees.map((e) => (
+                  <MenuItem key={e._id} value={e.name}>
+                    {e.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth margin="dense">
+              <InputLabel>Type</InputLabel>
+              <Select
+                value={newRecord.type}
+                label="Type"
+                onChange={(e) =>
+                  setNewRecord({ ...newRecord, type: e.target.value as any })
+                }
+              >
+                <MenuItem value="reward">Reward</MenuItem>
+                <MenuItem value="penalty">Fine</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              margin="dense"
+              label="Amount"
+              type="number"
+              fullWidth
+              value={newRecord.amount}
               onChange={(e) =>
-                setNewRecord({ ...newRecord, employeeName: e.target.value })
+                setNewRecord({ ...newRecord, amount: Number(e.target.value) })
               }
-            >
-              {employees.map((emp) => (
-                <MenuItem key={emp._id} value={emp.name}>
-                  {emp.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <DatePicker
-              label="Date"
-              value={selectedDate}
-              onChange={(newValue: Date | null) => setSelectedDate(newValue)}
-              slotProps={{ textField: { fullWidth: true, margin: "dense" } }}
             />
-          </LocalizationProvider>
-
-          <FormControl fullWidth margin="dense">
-            <InputLabel>Type</InputLabel>
-            <Select
-              value={newRecord.type}
-              label="Type"
-              onChange={(e) =>
-                setNewRecord({
-                  ...newRecord,
-                  type: e.target.value as RewardRecord["type"],
-                })
-              }
-            >
-              <MenuItem value="reward">Reward</MenuItem>
-              <MenuItem value="penalty">Penalty</MenuItem>
-            </Select>
-          </FormControl>
-
-          <TextField
-            margin="dense"
-            label="Amount"
-            type="number"
-            fullWidth
-            value={newRecord.amount}
-            onChange={(e) =>
-              setNewRecord({
-                ...newRecord,
-                amount: parseFloat(e.target.value) || 0,
-              })
-            }
-            InputProps={{
-              startAdornment: <Typography sx={{ mr: 1 }}>$</Typography>,
-            }}
-          />
-
-          <TextField
-            margin="dense"
-            label="Reason"
-            fullWidth
-            multiline
-            rows={4}
-            value={newRecord.reason}
-            onChange={(e) =>
-              setNewRecord({ ...newRecord, reason: e.target.value })
-            }
-          />
-        </DialogContent>
-
-        <DialogActions sx={{ px: 3, pb: 3 }}>
-          <Button onClick={handleClose} variant="outlined">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} variant="contained">
-            Create Record
-          </Button>
-        </DialogActions>
-      </Dialog>
+            <TextField
+              margin="dense"
+              label="Reason"
+              fullWidth
+              value={newRecord.reason}
+              onChange={(e) => setNewRecord({ ...newRecord, reason: e.target.value })}
+            />
+          </DialogContent>
+          <DialogActions sx={{ p: 2 }}>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleSave} variant="contained">
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      )}
     </Box>
   );
 }

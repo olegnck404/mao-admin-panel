@@ -1,137 +1,62 @@
-# Архітектурна документація
+# System Architecture
 
-## Clean Architecture
+The MAO Admin Panel is built upon the principles of **Clean Architecture**. This architectural style emphasizes the separation of concerns, creating a system that is independent of frameworks, UI, and databases. This approach leads to a more maintainable, scalable, and testable codebase.
 
-Проект побудований на принципах Clean Architecture, що забезпечує:
+## Architectural Layers
 
-- Незалежність від фреймворків
-- Тестованість
-- Незалежність від UI
-- Незалежність від бази даних
-- Незалежність від будь-яких зовнішніх сервісів
+The application is divided into four distinct layers, with a strict dependency rule: outer layers can depend on inner layers, but inner layers cannot depend on outer layers.
 
-### Шари архітектури
+```mermaid
+graph TD
+    A[Presentation Layer] --> B[Application Layer];
+    B --> C[Domain Layer];
+    D[Infrastructure Layer] --> C;
+```
 
-1. **Domain Layer** (найвнутрішній шар)
+### 1. Domain Layer (Inner Core)
 
-   - Містить бізнес-правила та логіку
-   - Не залежить від інших шарів
-   - Включає:
-     - Інтерфейси
-     - Сутності
-     - Value Objects
-     - DTO
+This is the heart of the application. It contains the core business logic, entities, and rules that are independent of any other part of the system.
 
-2. **Application Layer**
+- **Entities**: Core business objects (e.g., `User`, `Task`).
+- **Value Objects**: Objects representing descriptive aspects of the domain (e.g., `Email`, `Password`).
+- **Interfaces (Repositories/Services)**: Defines the contracts that the outer layers must implement. This layer dictates the behavior but not the implementation.
+- **DTOs (Data Transfer Objects)**: Simple objects used to carry data between layers without exposing domain entities.
 
-   - Оркеструє потік даних
-   - Реалізує use cases
-   - Використовує domain layer
-   - Не містить бізнес-правил
+### 2. Application Layer
 
-3. **Infrastructure Layer**
+This layer orchestrates the use cases of the application. It contains application-specific business logic and coordinates the flow of data from the presentation layer to the domain layer and back.
 
-   - Реалізує інтерфейси з domain layer
-   - Містить реалізації репозиторіїв
-   - Взаємодіє з зовнішніми сервісами
+- **Services**: Implements the use cases by orchestrating domain entities and repositories. For example, `UserService` handles the logic for creating, updating, and retrieving users.
 
-4. **Presentation Layer**
-   - React компоненти
-   - Управління станом UI
-   - Маршрутизація
+### 3. Infrastructure Layer
 
-## SOLID Принципи
+This layer is responsible for all external concerns, such as databases, API clients, and other third-party services. It implements the interfaces (repositories) defined in the Domain Layer.
 
-### Single Responsibility Principle
+- **Repositories**: Concrete implementations of the repository interfaces (e.g., `UserRepositoryImpl` which interacts with the database via an API).
+- **API Clients**: Classes responsible for making HTTP requests to the backend server (e.g., `UserApi`).
+- **Database Configuration**: Code for connecting to and interacting with the MongoDB database.
 
-Кожен клас має одну відповідальність:
+### 4. Presentation Layer (Outermost Layer)
 
-- UserRepository - робота з даними користувачів
-- UserService - бізнес-логіка користувачів
-- UserList - відображення списку користувачів
+This is the user-facing layer. In this project, it is a Single Page Application (SPA) built with React.
 
-### Open/Closed Principle
+- **React Components**: Reusable UI elements that make up the user interface (e.g., `UserList`, `TaskForm`).
+- **Hooks**: Custom React Hooks that encapsulate UI logic and state management (e.g., `useUsers`).
+- **Pages**: Top-level components that represent different screens or views in the application.
+- **Routing**: Manages navigation within the application using React Router.
 
-Класи відкриті для розширення, закриті для модифікації:
+## SOLID Principles
 
-- Нові типи фільтрів можна додавати без зміни існуючого коду
-- Нові типи помилок наслідують ApplicationError
+The project adheres to the SOLID principles to ensure a robust and maintainable design:
 
-### Liskov Substitution Principle
+- **Single Responsibility Principle**: Each class or module has one, and only one, reason to change. For example, `UserService` handles user logic, while `UserRepository` handles user data access.
+- **Open/Closed Principle**: Software entities should be open for extension but closed for modification. New features are added by creating new classes or extending existing ones, not by changing them.
+- **Liskov Substitution Principle**: Subtypes must be substitutable for their base types.
+- **Interface Segregation Principle**: Clients should not be forced to depend on interfaces they do not use. The project uses small, specific interfaces.
+- **Dependency Inversion Principle**: High-level modules should not depend on low-level modules. Both should depend on abstractions. This is achieved through the use of interfaces and dependency injection.
 
-Підкласи можуть замінювати базові класи:
+## Design Patterns
 
-- Всі репозиторії реалізують IUserRepository
-- Всі помилки наслідують ApplicationError
-
-### Interface Segregation Principle
-
-Клієнти не повинні залежати від методів, які вони не використовують:
-
-- Окремі інтерфейси для різних типів операцій
-- Розділення на дрібні, специфічні інтерфейси
-
-### Dependency Inversion Principle
-
-Залежності йдуть в сторону абстракцій:
-
-- Сервіси залежать від інтерфейсів, а не від конкретних класів
-- Використання інверсії залежностей через конструктор
-
-## Паттерни проектування
-
-### Repository Pattern
-
-- Абстрагує доступ до даних
-- Централізує логіку доступу до API
-- Спрощує тестування
-
-### Factory Pattern
-
-- Централізує створення сервісів
-- Управляє життєвим циклом об'єктів
-- Спрощує внедрення залежностей
-
-### Value Objects
-
-- Забезпечують валідацію даних
-- Інкапсулюють бізнес-правила
-- Гарантують цілісність даних
-
-## Діаграми
-
-### Потік даних
-
-\`\`\`
-UI -> Service -> Repository -> API -> Server
-\`\`\`
-
-### Залежності між шарами
-
-\`\`\`
-Presentation -> Application -> Domain <- Infrastructure
-\`\`\`
-
-## Керівництво по розробці
-
-### Додавання нової функціональності
-
-1. Визначити вимоги
-2. Додати необхідні інтерфейси в domain layer
-3. Реалізувати бізнес-логіку в application layer
-4. Додати необхідні репозиторії в infrastructure layer
-5. Створити UI компоненти в presentation layer
-
-### Обробка помилок
-
-1. Визначити тип помилки
-2. Створити відповідний клас помилки
-3. Обробити помилку на рівні сервісу
-4. Відобразити повідомлення користувачу
-
-### Тестування
-
-1. Unit тести для бізнес-логіки
-2. Інтеграційні тести для репозиторіїв
-3. End-to-end тести для UI
-4. Тести на типи даних
+- **Repository Pattern**: Abstracts the data layer, making it easier to switch data sources and test business logic independently of the database.
+- **Service Layer Pattern**: Encapsulates the application's business logic in services, promoting separation of concerns.
+- **Dependency Injection**: Used to provide dependencies to a class instead of having the class create them itself, promoting loose coupling.

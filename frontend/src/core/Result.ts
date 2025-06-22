@@ -23,14 +23,14 @@ export class Result<T = void, E = Error> {
 
   public getValue(): T {
     if (this.isFailure()) {
-      throw new Error('Не можна отримати значення з помилкового результату');
+      throw new Error('Cannot get value from a failed result');
     }
     return this._value!;
   }
 
   public getError(): E {
     if (this.isSuccess()) {
-      throw new Error('Не можна отримати помилку з успішного результату');
+      throw new Error('Cannot get error from a successful result');
     }
     return this._error!;
   }

@@ -28,13 +28,13 @@ const UserList: React.FC = () => {
   const totalPages = Math.ceil(totalItems / 10);
 
   if (loading) {
-    return <div>Загрузка...</div>;
+    return <div>Loading...</div>;
   }
 
   if (error) {
     return (
       <div style={{ color: 'red' }}>
-        Ошибка: {error}
+        Error: {error}
       </div>
     );
   }
@@ -48,18 +48,18 @@ const UserList: React.FC = () => {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Поиск по имени..."
+          placeholder="Search by name..."
         />
         <select
           value={selectedRole}
           onChange={(e) => setSelectedRole(e.target.value)}
         >
-          <option value="">Все роли</option>
-          <option value={USER_ROLES.ADMIN}>Администратор</option>
-          <option value={USER_ROLES.USER}>Пользователь</option>
-          <option value={USER_ROLES.MANAGER}>Менеджер</option>
+          <option value="">All roles</option>
+          <option value={USER_ROLES.ADMIN}>Administrator</option>
+          <option value={USER_ROLES.USER}>User</option>
+          <option value={USER_ROLES.MANAGER}>Manager</option>
         </select>
-        <button onClick={handleSearch}>Поиск</button>
+        <button onClick={handleSearch}>Search</button>
       </div>
 
       <ul>
@@ -73,14 +73,14 @@ const UserList: React.FC = () => {
           onClick={() => changePage(currentPage - 1)} 
           disabled={currentPage === 1}
         >
-          Назад
+          Previous
         </button>
-        <span>Страница {currentPage} из {totalPages}</span>
+        <span>Page {currentPage} of {totalPages}</span>
         <button 
           onClick={() => changePage(currentPage + 1)} 
           disabled={currentPage === totalPages}
         >
-          Вперед
+          Next
         </button>
       </div>
     </div>

@@ -1,72 +1,44 @@
-# MAO Admin Panel
+# Development of an Admin Panel for MAO Restaurant Staff Management
 
-[![CI/CD](https://github.com/olegnck404/mao-admin-panel/actions/workflows/ci.yml/badge.svg)](https://github.com/olegnck404/mao-admin-panel/actions/workflows/ci.yml)
-[![Documentation](https://github.com/olegnck404/mao-admin-panel/actions/workflows/documentation.yml/badge.svg)](https://github.com/olegnck404/mao-admin-panel/actions/workflows/documentation.yml)
+Qualifying work for the confirmation of the degree of professional junior bachelor ([VSP «PPFK NTU «KhPI»](http://polytechnic.poltava.ua)).
+Supervisor – **Krivtsova Olena Pavlivna**.
 
-Адміністративна панель для керування системою MAO. Проєкт побудований на принципах Clean Architecture з використанням React і TypeScript.
+## Thesis Objectives
 
-[📚 Документация](https://olegnck404.github.io/mao-admin-panel/)
+The developed software product must provide the following functionality:
 
-## Швидкий старт
+- Tracking work shifts
+- Assigning global and personal tasks
+- Recording tardiness
+- System of rewards and fines
 
-```bash
-# Клонування репозиторію
+## Technologies Used
 
-git clone https://github.com/your-username/mao-admin-panel.git
-cd mao-admin-panel
-npm install
-npm run dev
-```
+This project utilizes a modern technology stack for both frontend and backend development.
 
-## Структура проєкту
+### Backend
 
-- `src/` — вихідний код (domain, application, infrastructure, presentation)
-- `docs/` — детальна документація (архітектура, API, гайди)
-- `public/` — статичні файли
+- **Node.js**: A JavaScript runtime environment for executing server-side code.
+- **Express**: A minimal and flexible Node.js web application framework that provides a robust set of features.
+- **TypeScript**: A statically typed superset of JavaScript that adds type safety to the application.
+- **MongoDB**: A NoSQL database used for storing application data.
+- **Mongoose**: An Object Data Modeling (ODM) library for MongoDB and Node.js.
 
-## Документація
+### Frontend
 
-- [Повна документація](docs/FULL_DOCUMENTATION.md)
-- [Гайд для розробника](docs/development-guide.md)
-- [Архітектура](docs/ARCHITECTURE.md)
-- [API](docs/API.md)
-- [Помилки](docs/errors.md)
+- **React**: A JavaScript library for building user interfaces.
+- **TypeScript**: Ensures type safety in the frontend codebase.
+- **Vite**: A fast build tool and development server for modern web projects.
+- **Material-UI (MUI)**: A comprehensive suite of UI tools to help you ship new features faster.
+- **Axios**: A promise-based HTTP client for the browser and Node.js.
+- **React Router**: For declarative routing in the React application.
+- **date-fns**: A modern JavaScript date utility library.
 
-## CI/CD з GitHub Actions
+### Tooling
 
-Для автоматизації збірки та тестування використовуйте GitHub Actions. Приклад workflow:
+- **Git**: A distributed version control system for tracking changes in source code during software development.
+- **ESLint**: A pluggable and configurable linter tool for identifying and reporting on patterns in JavaScript.
 
-```yaml
-name: Node.js CI
+## Published Product
 
-on:
-  push:
-    branches: [master]
-  pull_request:
-    branches: [master]
-
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "18.x"
-      - run: npm ci
-      - run: npm run lint
-      - run: npm run test
-      - run: npm run build
-```
-
-## Внесення змін
-
-1. Створіть нову гілку для змін
-2. Покрийте новий функціонал тестами
-3. Зробіть осмислений commit
-4. Відкрийте Pull Request
-
-## Ліцензія
-
-MIT
+The project website is available at: [GitHub Pages](https://olegnck404.github.io/mao-admin-panel)

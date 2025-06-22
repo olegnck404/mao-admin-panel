@@ -11,30 +11,30 @@ import PersonAddRoundedIcon from "@mui/icons-material/PersonAddRounded";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 
 import {
-  AppBar,
-  Avatar,
-  Badge,
-  Box,
-  CssBaseline,
-  Divider,
-  Drawer,
-  IconButton,
-  InputBase,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Menu,
-  MenuItem,
-  Paper,
-  Popover,
-  Switch,
-  Toolbar,
-  Tooltip,
-  Typography,
-  useMediaQuery,
-  useTheme,
+    AppBar,
+    Avatar,
+    Badge,
+    Box,
+    CssBaseline,
+    Divider,
+    Drawer,
+    IconButton,
+    InputBase,
+    List,
+    ListItem,
+    ListItemButton,
+    ListItemIcon,
+    ListItemText,
+    Menu,
+    MenuItem,
+    Paper,
+    Popover,
+    Switch,
+    Toolbar,
+    Tooltip,
+    Typography,
+    useMediaQuery,
+    useTheme,
 } from "@mui/material";
 
 import { keyframes } from "@mui/system";
@@ -83,7 +83,18 @@ const menuItems = [
     text: "Users List",
     icon: <EmojiEventsRoundedIcon />,
     path: "/mao-admin-panel/users-list",
-  }, // новый пункт меню
+  },
+  {
+    text: "Profile",
+    icon: (
+      <Avatar
+        sx={{ width: 24, height: 24, bgcolor: "primary.main", fontSize: 14 }}
+      >
+        P
+      </Avatar>
+    ),
+    path: "/mao-admin-panel/cabinet",
+  },
 ];
 
 type LayoutProps = {
@@ -93,7 +104,7 @@ type LayoutProps = {
 export default function Layout({ children }: LayoutProps) {
   const theme = useTheme();
   const { mode, toggleTheme } = useThemeMode();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [mobileOpen, setMobileOpen] = useState(false);
   const [searchAnchor, setSearchAnchor] = useState<null | HTMLElement>(null);
@@ -113,7 +124,7 @@ export default function Layout({ children }: LayoutProps) {
   const handleSearch = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       setSearchAnchor(null);
-      // реализуй логику поиска, если нужна
+      // implement search logic if needed
     }
   };
 
@@ -138,9 +149,25 @@ export default function Layout({ children }: LayoutProps) {
     },
   ];
 
+  const filteredMenuItems = menuItems.filter((item) => {
+    if (!user) return false;
+    if (user.role === "user") {
+      // Employee sees only these sections
+      return [
+        "Dashboard",
+        "Tasks",
+        "Attendance",
+        "Rewards",
+        "Profile",
+      ].includes(item.text);
+    }
+    // Admin and manager see everything
+    return true;
+  });
+
   const drawer = (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      {/* Верхняя часть - аватар и имя */}
+      {/* Top section - avatar and name */}
       <Box
         sx={{
           p: 2,
@@ -168,20 +195,20 @@ export default function Layout({ children }: LayoutProps) {
           }}
           onClick={(e) => setUserMenuAnchor(e.currentTarget)}
         >
-          R
+          {user?.name?.charAt(0) || "U"}
         </Avatar>
         <Typography
           variant="subtitle1"
           fontWeight="600"
           sx={{ letterSpacing: "-0.025em" }}
         >
-          Restaurant Admin
+          {user?.name || "User"}
         </Typography>
       </Box>
 
-      {/* Список пунктов меню */}
+      {/* Menu items list */}
       <List sx={{ flex: 1, px: 1 }}>
-        {menuItems.map((item, index) => (
+        {filteredMenuItems.map((item, index) => (
           <ListItem
             key={item.text}
             disablePadding
@@ -250,7 +277,7 @@ export default function Layout({ children }: LayoutProps) {
         ))}
       </List>
 
-      {/* Нижняя панель с переключателем темы */}
+      {/* Bottom panel with theme switcher */}
       <Box
         sx={{
           p: 2,
@@ -278,7 +305,7 @@ export default function Layout({ children }: LayoutProps) {
         </Box>
       </Box>
 
-      {/* Меню пользователя */}
+      {/* User menu */}
       <Menu
         anchorEl={userMenuAnchor}
         open={Boolean(userMenuAnchor)}
@@ -304,11 +331,31 @@ export default function Layout({ children }: LayoutProps) {
         transformOrigin={{ horizontal: "left", vertical: "top" }}
         anchorOrigin={{ horizontal: "left", vertical: "bottom" }}
       >
+        <MenuItem
+          onClick={() => {
+            setUserMenuAnchor(null);
+            navigate("/mao-admin-panel/cabinet");
+          }}
+        >
+          <ListItemIcon>
+            <Avatar
+              sx={{
+                width: 24,
+                height: 24,
+                bgcolor: "primary.main",
+                fontSize: 14,
+              }}
+            >
+              {user?.name?.charAt(0) || "U"}
+            </Avatar>
+          </ListItemIcon>
+          Personal Cabinet
+        </MenuItem>
         <MenuItem onClick={logout}>
           <ListItemIcon>
             <LogoutRoundedIcon fontSize="small" />
           </ListItemIcon>
-          Sign Out
+          Log out
         </MenuItem>
       </Menu>
     </Box>

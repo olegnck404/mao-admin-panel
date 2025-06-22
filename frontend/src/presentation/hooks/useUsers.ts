@@ -49,7 +49,7 @@ export const useUsers = (
     } catch (err) {
       const errorMessage = err instanceof ApplicationError
         ? err.message
-        : 'Произошла ошибка при загрузке пользователей';
+        : 'An error occurred while loading users';
       setError(errorMessage);
     } finally {
       setLoading(false);

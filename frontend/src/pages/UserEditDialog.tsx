@@ -1,13 +1,13 @@
 import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  TextField,
-  Typography,
+    Box,
+    Button,
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Divider,
+    TextField,
+    Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 
@@ -58,7 +58,7 @@ export default function UserEditDialog({
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
       <DialogTitle>Edit User</DialogTitle>
       <DialogContent>
-        {/* Балансы пользователя */}
+        {/* User balances */}
         {user && (
           <Box mb={2}>
             <Typography variant="subtitle1" fontWeight={600}>
