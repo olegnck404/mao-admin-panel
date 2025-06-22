@@ -47,6 +47,40 @@ You will also need a running [MongoDB](https://www.mongodb.com/) instance. You c
 
 ## Running the Application
 
+You can run the application in two ways: manually by starting each service, or using Docker for a more streamlined setup.
+
+### Running with Docker (Recommended)
+
+This is the easiest way to get the entire application stack running.
+
+**Prerequisites:**
+
+- [Docker](https://www.docker.com/get-started)
+- [Docker Compose](https://docs.docker.com/compose/install/)
+
+**Steps:**
+
+1.  From the root of the project directory, run the following command:
+    ```bash
+    docker-compose up -d
+    ```
+2.  That's it! This single command will:
+    - Build the Docker images for the frontend and backend services.
+    - Start the containers for the `frontend`, `backend`, and `mongo` services in the background.
+
+You can now access the services:
+
+- **Frontend:** [http://localhost:8080](http://localhost:8080)
+- **Backend API:** [http://localhost:5000](http://localhost:5000)
+
+To stop the services, run:
+
+```bash
+docker-compose down
+```
+
+### Manual Setup
+
 You need to run the backend and frontend servers in separate terminals.
 
 1.  **Start the Backend Server:**

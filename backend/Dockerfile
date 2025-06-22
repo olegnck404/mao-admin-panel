@@ -7,8 +7,11 @@ WORKDIR /usr/src/app
 # Copy package.json and package-lock.json to the working directory
 COPY package*.json ./
 
-# Install any needed packages
+# Install dependencies
 RUN npm install
+
+# Install ts-node globally
+RUN npm install -g ts-node
 
 # Bundle app source
 COPY . .

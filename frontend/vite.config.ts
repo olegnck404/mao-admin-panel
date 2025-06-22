@@ -18,7 +18,6 @@ export default defineConfig({
     }),
     visualizer()
   ],
-  base: '/mao-admin-panel/',
   server: {
     port: 3000,
     open: true,

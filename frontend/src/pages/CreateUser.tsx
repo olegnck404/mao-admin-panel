@@ -21,7 +21,7 @@ export default function CreateUser() {
     e.preventDefault();
 
     try {
-      await axios.post("http://localhost:4000/api/users", formData);
+      await axios.post("/api/users", formData);
       enqueueSnackbar("User created successfully!", { variant: "success" });
       setFormData({ name: "", email: "", role: "user", password: "" });
     } catch (error: any) {
