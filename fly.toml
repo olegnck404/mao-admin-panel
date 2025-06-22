@@ -1,0 +1,38 @@
+# fly.toml file generated for mao-admin-panel
+
+app = "mao-admin-panel"
+primary_region = "waw" # example region
+
+[build]
+  dockerfile = "frontend/Dockerfile"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 80
+  
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "2s"
+    method = "GET"
+    path = "/"
+
+[env]
+  # Add any environment variables for the frontend here
+  # EXAMPLE_VAR = "example_value"
+
+[[statics]]
+  guest_path = "/usr/share/nginx/html"
+  url_prefix = "/" 
