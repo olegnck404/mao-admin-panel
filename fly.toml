@@ -1,38 +1,48 @@
-# fly.toml file generated for mao-admin-panel
+# fly.toml app configuration file generated for mao-admin-panel on 2025-06-23T20:46:20+03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "mao-admin-panel"
-primary_region = "waw" # example region
+app = 'mao-admin-panel'
+primary_region = 'waw'
 
 [build]
-  dockerfile = "frontend/Dockerfile"
+  dockerfile = 'frontend/Dockerfile'
+
+[env]
+  VITE_API_BASE_URL = 'https://mao-admin-panel-backend.fly.dev'
+  VITE_API_URL = 'https://mao-admin-panel-backend.fly.dev'
+  VITE_APP_NAME = 'MAO Admin Panel'
+  VITE_DEFAULT_PAGE_SIZE = '10'
 
 [[services]]
-  protocol = "tcp"
+  protocol = 'tcp'
   internal_port = 80
-  
+
   [[services.ports]]
     port = 80
-    handlers = ["http"]
-  
+    handlers = ['http']
+
   [[services.ports]]
     port = 443
-    handlers = ["tls", "http"]
+    handlers = ['tls', 'http']
 
   [services.concurrency]
-    type = "connections"
+    type = 'connections'
     hard_limit = 25
     soft_limit = 20
 
   [[services.http_checks]]
-    interval = "10s"
-    timeout = "2s"
-    method = "GET"
-    path = "/"
+    interval = '10s'
+    timeout = '2s'
+    method = 'GET'
+    path = '/'
 
-[env]
-  # Add any environment variables for the frontend here
-  # EXAMPLE_VAR = "example_value"
+[[vm]]
+  memory = '1gb'
+  cpu_kind = 'shared'
+  cpus = 1
 
 [[statics]]
-  guest_path = "/usr/share/nginx/html"
-  url_prefix = "/" 
+  guest_path = '/usr/share/nginx/html'
+  url_prefix = '/'

@@ -9,6 +9,8 @@ services:
       - backend
     networks:
       - mao-network
+    env_file:
+      - ./frontend/.env
 
   backend:
     build:
@@ -22,6 +24,8 @@ services:
       - mongo
     networks:
       - mao-network
+    env_file:
+      - ./backend/.env
 
   mongo:
     image: mongo:latest
@@ -38,4 +42,4 @@ networks:
 
 volumes:
   mongo-data:
-    driver: local 
+    driver: local

@@ -1,0 +1,35 @@
+# fly.toml для backend (production)
+app = "mao-admin-panel-backend"
+primary_region = "waw"
+
+[build]
+  dockerfile = "backend/Dockerfile"
+
+[[services]]
+  protocol = "tcp"
+  internal_port = 8080
+  
+  [[services.ports]]
+    port = 80
+    handlers = ["http"]
+  
+  [[services.ports]]
+    port = 443
+    handlers = ["tls", "http"]
+
+  [services.concurrency]
+    type = "connections"
+    hard_limit = 25
+    soft_limit = 20
+
+  [[services.http_checks]]
+    interval = "10s"
+    timeout = "2s"
+    method = "GET"
+    path = "/"
+
+[env]
+  MONGO_URI = "mongodb+srv://olegnck:o1JFdHhI5M0ZfUXt@cluster0.jdfiqhr.mongodb.net/mao-admin-panel?retryWrites=true&w=majority"
+  PORT = "8080"
+  CORS_ORIGIN = "https://mao-admin-panel.fly.dev"
+  SUPER_ADMIN_KEY = "SUPER_ADMIN_KEY"

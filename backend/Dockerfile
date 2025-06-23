@@ -5,7 +5,7 @@ FROM node:18-alpine
 WORKDIR /usr/src/app
 
 # Copy package.json and package-lock.json to the working directory
-COPY package*.json ./
+COPY backend/package*.json ./
 
 # Install dependencies
 RUN npm install
@@ -14,17 +14,19 @@ RUN npm install
 RUN npm install -g ts-node
 
 # Bundle app source
-COPY . .
+COPY backend .
+
+# Copy production environment variables
+COPY backend/.env.production .env.production
 
 # Build TypeScript code
 RUN npm run build
 
-# Make port 5000 available to the world outside this container
-EXPOSE 5000
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
 
 # Define environment variables (can be overridden)
-ENV MONGO_URI=mongodb://mongo:27017/mao-admin-panel
-ENV PORT=5000
+ENV PORT=8080
 
 # Run the app when the container launches
-CMD [ "node", "dist/app.js" ] 
+CMD [ "node", "dist/server.js" ]

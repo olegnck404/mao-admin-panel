@@ -1,5 +1,6 @@
 import axios from "axios";
 import cors from "cors";
+import dotenv from "dotenv";
 import express, { NextFunction, Request, Response } from "express";
 import { connectDB } from "./config/db"; // Import DB connection
 import errorHandler from "./middlewares/errorHandler";
@@ -13,11 +14,16 @@ import rewardsFinesRouter from "./routes/rewardsFines";
 import taskRouter from "./routes/task.routes";
 import userRoutes from "./routes/user.routes";
 
+dotenv.config({ path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env' });
+
 const app = express();
 app.use(express.json());
 
 // Enable CORS with necessary options
-app.use(cors({ origin: "http://localhost:8080", credentials: true }));
+app.use(cors({
+  origin: (process.env.CORS_ORIGIN || "http://localhost:8080").split(','),
+  credentials: true
+}));
 app.use("/api/dashboard", dashboardRoutes);
 
 // Endpoint for user login (without encryption)
